@@ -1,35 +1,4 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>CacaoMood — Cas d'Étude RAG</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
-</head>
-<body>
-  <div class="container">
-    <div class="pixel-card">
-      <h1 class="pixel-title">🍫 CacaoMood — Implémentation d'une solution RAG</h1>
-      <p class="meta">Rôle : Développeuse bases de données &amp; Ingénieure IA · Temps estimé : 45 minutes</p>
-
-      <h2>Contexte &amp; Objectif</h2>
-      <p>CacaoMood est une plateforme e‑commerce et holistique. Objectif : créer un assistant virtuel recommandant des rituels de cacao en s'appuyant uniquement sur le catalogue produit (grounding strict) pour éviter les hallucinations.</p>
-
-      <h2>Étapes clés</h2>
-      <ol>
-        <li><strong>Infrastructure relationnelle</strong> — Tables produit + colonne vectorielle native VECTOR(1536) pour les embeddings.</li>
-        <li><strong>Sécurité &amp; modèles externes</strong> — Identity Managed pour Azure OpenAI ; déclaration d'un MODEL externe pour embeddings.</li>
-        <li><strong>Vectorisation par lots</strong> — Script T‑SQL robuste avec batching, pause et retry en cas de rate‑limit.</li>
-        <li><strong>Indexation DiskANN</strong> — Index vectoriel ANN (DiskANN) pour recherche rapide.</li>
-        <li><strong>Procédure stockée RAG</strong> — dbo.AskCacaoQuestion : retrieval (VECTOR_SEARCH), augmentation (FOR JSON) et génération via sp_invoke_external_rest_endpoint.</li>
-      </ol>
-
-      <h2>SQL complet (collapsible)</h2>
-
-      <details>
-        <summary><strong>1) Suppression & création des tables + insertion (catalogue)</strong></summary>
-        <pre><code>-- Suppression des tables si elles existent pour repartir à neuf
+-- Suppression des tables si elles existent pour repartir à neuf
 DROP TABLE IF EXISTS dbo.CacaoProducts;
 DROP TABLE IF EXISTS dbo.ProductBenefits;
 GO
@@ -60,15 +29,12 @@ INSERT INTO dbo.ProductBenefits (BenefitName, TargetMood) VALUES
 ('Ancrage &amp; Méditation Chamanique', 'Pleine conscience, Connexion spirituelle');
 
 INSERT INTO dbo.CacaoProducts (ProductName, OriginCountry, Description, Price, BenefitID) VALUES
-(N'« Élixir Cacao Sacré »', N'Pérou', N'Un cacao de variété Criollo, idéal pour l''ancrage spirituel lors des méditations. Offre des notes terreuses et une douceur qui apaise l''esprit sans caféine agressive.', 29.99, 3),
+(N'" Élixir Cacao Sacré"', N'Pérou', N'Un cacao de variété Criollo, idéal pour l''ancrage spirituel lors des méditations. Offre des notes terreuses et une douceur qui apaise l''esprit sans caféine agressive.', 29.99, 3),
 (N'Aurore Énergisante', N'Équateur', N'Alternative douce et parfaite au café pour le matin. Enrichi aux épices douces, il stimule la concentration et réveille le corps en douceur pour un rituel sans stress.', 24.50, 1),
 (N'Sérénité du Soir', N'Madagascar', N'Cacao extra-fin aux notes florales et de vanille. Conçu spécifiquement pour le rituel de fin de journée, il aide à relâcher l''anxiété et prépare à un sommeil profond.', 27.00, 2);
-GO</code></pre>
-      </details>
+GO
 
-      <details>
-        <summary><strong>2) Sécurité &amp; Configuration des modèles externes (Identity Managed)</strong></summary>
-        <pre><code>-- 1. Création de la clé maîtresse de chiffrement de la base (si inexistante)
+-- 1. Création de la clé maîtresse de chiffrement de la base (si inexistante)
 IF NOT EXISTS (SELECT * FROM sys.symmetric_keys WHERE name = '##MS_DatabaseMasterKey##')
 BEGIN
     CREATE MASTER KEY ENCRYPTION BY PASSWORD 'TonMotDePasseFortEtSecurise123!';
@@ -91,12 +57,10 @@ WITH (
     MODEL = 'text-embedding-3-small',
     CREDENTIAL = [https://cacaomood-openai.openai.azure.com]
 );
-GO</code></pre>
-      </details>
+GO
 
-      <details>
-        <summary><strong>3) Vectorisation automatique par lots (batching + retry)</strong></summary>
-        <pre><code>DECLARE @batchSize INT = 30; -- Taille des lots de traitement
+-- Vectorisation batch
+DECLARE @batchSize INT = 30; -- Taille des lots de traitement
 DECLARE @rowsUpdated INT = 1;
 DECLARE @retryCount INT;
 DECLARE @maxRetries INT = 3;
@@ -144,29 +108,22 @@ GO
 -- Vérification de la réussite de l'opération
 SELECT COUNT(*) AS TotalCacaos, COUNT(CacaoVector) AS CacaosVectorises 
 FROM dbo.CacaoProducts;
-GO</code></pre>
-      </details>
+GO
 
-      <details>
-        <summary><strong>4) Activation index DiskANN</strong></summary>
-        <pre><code>-- 1. Activation des fonctionnalités en preview requises pour l'indexation vectorielle
+-- Activation DiskANN
 ALTER DATABASE SCOPED CONFIGURATION SET PREVIEW_FEATURES = ON;
 GO
 
--- 2. Option essentielle : Empêcher la table de passer en mode "Lecture Seule"
 ALTER DATABASE SCOPED CONFIGURATION SET ALLOW_STALE_VECTOR_INDEX = ON;
 GO
 
--- 3. Création de l'index vectoriel basé sur la similarité cosinus
 CREATE VECTOR INDEX IX_CacaoProducts_CacaoVector
 ON dbo.CacaoProducts(CacaoVector)
 WITH (METRIC = 'cosine', TYPE = 'DISKANN');
-GO</code></pre>
-      </details>
+GO
 
-      <details>
-        <summary><strong>5) Procédure stockée RAG (dbo.AskCacaoQuestion)</strong></summary>
-        <pre><code>CREATE OR ALTER PROCEDURE dbo.AskCacaoQuestion
+-- Procédure AskCacaoQuestion
+CREATE OR ALTER PROCEDURE dbo.AskCacaoQuestion
     @Question NVARCHAR(1000),
     @Answer NVARCHAR(MAX) OUTPUT
 AS
@@ -248,12 +205,9 @@ BEGIN
         SET @Answer = N'Une connexion réseau instable empêche de joindre l''assistant IA. Statut technique de l''erreur : HTTP ' + CAST(@returnValue AS NVARCHAR(10));
     END
 END;
-GO</code></pre>
-      </details>
+GO
 
-      <details>
-        <summary><strong>6) Tests &amp; Recette (exemples)</strong></summary>
-        <pre><code>-- Test 1 : Demande pour un rituel sans stress du matin
+-- Tests
 DECLARE @reponseApplication NVARCHAR(MAX);
 
 EXEC dbo.AskCacaoQuestion 
@@ -263,7 +217,6 @@ EXEC dbo.AskCacaoQuestion
 SELECT @reponseApplication AS [Assistant_CacaoMood_Output];
 GO
 
--- Test 2 : Demande pour l'anxiété du soir
 DECLARE @reponseApplication2 NVARCHAR(MAX);
 
 EXEC dbo.AskCacaoQuestion 
@@ -271,13 +224,4 @@ EXEC dbo.AskCacaoQuestion
     @Answer = @reponseApplication2 OUTPUT;
 
 SELECT @reponseApplication2 AS [Assistant_CacaoMood_Output];
-GO</code></pre>
-      </details>
-
-      <p class="meta">Compétences : SQL avancé, embeddings, index vectoriel, RAG, Azure OpenAI</p>
-
-      <p><a class="pixel-link" href="/projects/cacao_rag_full.sql" download>📥 Télécharger le SQL complet</a> • <a class="pixel-link" href="/">← Retour</a></p>
-    </div>
-  </div>
-</body>
-</html> 
+GO
