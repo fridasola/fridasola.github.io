@@ -29,7 +29,8 @@
 
       <details>
         <summary><strong>1) Suppression & création des tables + insertion (catalogue)</strong></summary>
-        <pre><code>-- Suppression des tables si elles existent pour repartir à neuf
+        <button class="copy-btn" data-target="sql-1">Copier le SQL</button>
+        <pre id="sql-1"><code>-- Suppression des tables si elles existent pour repartir à neuf
 DROP TABLE IF EXISTS dbo.CacaoProducts;
 DROP TABLE IF EXISTS dbo.ProductBenefits;
 GO
@@ -68,7 +69,8 @@ GO</code></pre>
 
       <details>
         <summary><strong>2) Sécurité &amp; Configuration des modèles externes (Identity Managed)</strong></summary>
-        <pre><code>-- 1. Création de la clé maîtresse de chiffrement de la base (si inexistante)
+        <button class="copy-btn" data-target="sql-2">Copier le SQL</button>
+        <pre id="sql-2"><code>-- 1. Création de la clé maîtresse de chiffrement de la base (si inexistante)
 IF NOT EXISTS (SELECT * FROM sys.symmetric_keys WHERE name = '##MS_DatabaseMasterKey##')
 BEGIN
     CREATE MASTER KEY ENCRYPTION BY PASSWORD 'TonMotDePasseFortEtSecurise123!';
@@ -96,7 +98,8 @@ GO</code></pre>
 
       <details>
         <summary><strong>3) Vectorisation automatique par lots (batching + retry)</strong></summary>
-        <pre><code>DECLARE @batchSize INT = 30; -- Taille des lots de traitement
+        <button class="copy-btn" data-target="sql-3">Copier le SQL</button>
+        <pre id="sql-3"><code>DECLARE @batchSize INT = 30; -- Taille des lots de traitement
 DECLARE @rowsUpdated INT = 1;
 DECLARE @retryCount INT;
 DECLARE @maxRetries INT = 3;
@@ -149,7 +152,8 @@ GO</code></pre>
 
       <details>
         <summary><strong>4) Activation index DiskANN</strong></summary>
-        <pre><code>-- 1. Activation des fonctionnalités en preview requises pour l'indexation vectorielle
+        <button class="copy-btn" data-target="sql-4">Copier le SQL</button>
+        <pre id="sql-4"><code>-- 1. Activation des fonctionnalités en preview requises pour l'indexation vectorielle
 ALTER DATABASE SCOPED CONFIGURATION SET PREVIEW_FEATURES = ON;
 GO
 
@@ -166,7 +170,8 @@ GO</code></pre>
 
       <details>
         <summary><strong>5) Procédure stockée RAG (dbo.AskCacaoQuestion)</strong></summary>
-        <pre><code>CREATE OR ALTER PROCEDURE dbo.AskCacaoQuestion
+        <button class="copy-btn" data-target="sql-5">Copier le SQL</button>
+        <pre id="sql-5"><code>CREATE OR ALTER PROCEDURE dbo.AskCacaoQuestion
     @Question NVARCHAR(1000),
     @Answer NVARCHAR(MAX) OUTPUT
 AS
@@ -213,7 +218,7 @@ BEGIN
         'messages': JSON_ARRAY(
             JSON_OBJECT(
                 'role': 'system', 
-                'content': N'Tu es l''assistante holistique experte pour la marque CacaoMood. Directives absolues :\n1. Réponds aux questions des clientes en utilisant UNIQUEMENT les données du catalogue fournies.\n2. Si les données fournies ne permettent pas de répondre, dis gentiment que tu dois valider auprès de l''équipe.\n3. Ne crée JAMAIS de bienfaits, d''origines ou de prix imaginaires.\n4. Garde un ton doux, chaleureux, axé sur le bien-être et réponds en moins de 150 mots.'
+                'content': N'Tu es l''assistante holistique experte pour la marque CacaoMood. Directives absolues :\\n1. Réponds aux questions des clientes en utilisant UNIQUEMENT les données du catalogue fournies.\\n2. Si les données fournies ne permettent pas de répondre, dis gentiment que tu dois valider auprès de l''équipe.\\n3. Ne crée JAMAIS de bienfaits, d''origines ou de prix imaginaires.\\n4. Garde un ton doux, chaleureux, axé sur le bien-être et réponds en moins de 150 mots.'
             ),
             JSON_OBJECT(
                 'role': 'user', 
@@ -253,7 +258,8 @@ GO</code></pre>
 
       <details>
         <summary><strong>6) Tests &amp; Recette (exemples)</strong></summary>
-        <pre><code>-- Test 1 : Demande pour un rituel sans stress du matin
+        <button class="copy-btn" data-target="sql-6">Copier le SQL</button>
+        <pre id="sql-6"><code>-- Test 1 : Demande pour un rituel sans stress du matin
 DECLARE @reponseApplication NVARCHAR(MAX);
 
 EXEC dbo.AskCacaoQuestion 
@@ -279,5 +285,6 @@ GO</code></pre>
       <p><a class="pixel-link" href="/projects/cacao_rag_full.sql" download>📥 Télécharger le SQL complet</a> • <a class="pixel-link" href="/">← Retour</a></p>
     </div>
   </div>
+  <script src="/assets/copy.js"></script>
 </body>
-</html> 
+</html>

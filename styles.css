@@ -26,5 +26,15 @@ body{font-family:'Poppins',system-ui,Segoe UI,Helvetica,Arial;line-height:1.45;b
 .pixel-link{display:inline-block;margin-top:8px;padding:8px 12px;background:var(--accent-1);color:#5a2f3b;border-radius:8px;text-decoration:none;font-weight:600}
 .footer-accent{height:6px;background-image:url('assets/stripes.svg');background-size:200px}
 footer{padding:14px 0;text-align:center;color:var(--muted)}
+
+/* Copy button */
+.copy-btn{display:inline-block;margin:8px 0;padding:6px 10px;border-radius:8px;background:linear-gradient(180deg,var(--card-bg),#fff);color:#5a2f3b;border:1px solid rgba(90,47,59,0.08);cursor:pointer;font-size:0.9rem}
+.copy-btn:active{transform:translateY(1px)}
+.copy-feedback{margin-left:10px;font-size:0.85rem;color:var(--muted)}
+
+/* code block styling */
+pre{background:#fff;border-radius:8px;padding:12px;overflow:auto;border:1px solid rgba(0,0,0,0.04)}
+code{font-family:monospace;font-size:0.92rem;color:#2d1f24}
+
 /* responsive */
 @media (min-width:768px){.container{max-width:1100px}.pixel-title{font-size:2.6rem}}

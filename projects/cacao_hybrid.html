@@ -40,7 +40,8 @@
 
       <details>
         <summary><strong>SQL : Requête hybride RRF (exemple)</strong></summary>
-        <pre><code>DECLARE @userInputText NVARCHAR(1000) = 'remplacer mon café du matin sans stress et avec de la douceur';
+        <button class="copy-btn" data-target="sql-hybrid-1">Copier le SQL</button>
+        <pre id="sql-hybrid-1"><code>DECLARE @userInputText NVARCHAR(1000) = 'remplacer mon café du matin sans stress et avec de la douceur';
 DECLARE @userQueryVector VECTOR(1536) = '[0.012, -0.043, ...]'; -- Généré via l'API d'embeddings
 DECLARE @rrfK INT = 60;
 DECLARE @topN INT = 50;
@@ -91,5 +92,6 @@ ORDER BY c.rrf_score DESC;
       <p><a class="pixel-link" href="/projects/cacao_hybrid_full.sql" download>📥 Télécharger le SQL complet</a> • <a class="pixel-link" href="/">← Retour</a></p>
     </div>
   </div>
+  <script src="/assets/copy.js"></script>
 </body>
 </html>
