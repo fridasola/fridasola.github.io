@@ -1,10 +1,12 @@
 Portfolio pour Emily NOLE (fridasola)
 
+Design : thème girly rétro pixel-art.
+
 Ce dépôt contient un portfolio simple et une page projet détaillée : "Analyse de Trafic Réseau & Durcissement de Serveur Web" (yummyrecipesforme).
 
 Installation locale:
 1. Cloner le dépôt.
-2. Ajouter la photo de profil dans `assets/profile.svg` ou `assets/profile.jpg`.
+2. Ajouter la photo de profil en remplaçant `assets/profile.svg` si souhaité.
 3. Remplacer les placeholders des autres projets dans `index.html` par vos titres, descriptions, liens et images.
 4. Commit et push sur GitHub.
 

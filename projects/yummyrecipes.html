@@ -4,38 +4,30 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Analyse SOC — yummyrecipesforme</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css">
 </head>
-<body>
-  <div class="container">
+<body class="retro">
+  <div class="container pixel-card">
     <a href="/">← Retour au portfolio</a>
-    <h1>Analyse de Trafic Réseau &amp; Durcissement de Serveur Web</h1>
-    <p><strong>Rôle :</strong> Analyste SOC (Security Operations Center)</p>
-    <p><strong>Objectif :</strong> Identifier une vulnérabilité réseau sur yummyrecipesforme.com et proposer un plan de durcissement pour protéger les données utilisateurs.</p>
+    <h1 style="font-family:'Press Start 2P',monospace;font-size:16px">Analyse de Trafic Réseau &amp; Durcissement</h1>
+    <p><strong>Rôle :</strong> Analyste SOC</p>
+    <p><strong>Objectif :</strong> Identifier une vulnérabilité réseau sur yummyrecipesforme.com et proposer un plan de durcissement.</p>
 
     <h2>1. Analyse de l'incident</h2>
     <ul>
-      <li><strong>Symptôme :</strong> Risque d'interception des données utilisateurs (MitM) lors de la connexion.</li>
-      <li><strong>Méthodologie :</strong> Examen d'extraits de tcpdump et d'entêtes réseau.</li>
-      <li><strong>Preuve :</strong> Entrées tcpdump montrant des connexions sur le port 80 (HTTP) : « yummyrecipesforme.com.http » indiquant usage non chiffré.</li>
+      <li><strong>Symptôme :</strong> Risque d'interception des données utilisateurs.</li>
+      <li><strong>Preuve :</strong> Entrées tcpdump montrant des connexions sur le port 80 (HTTP).</li>
     </ul>
 
-    <h2>2. Évaluation du risque</h2>
-    <p>Transfert en clair d'identifiants et cookies de session exposant les utilisateurs aux attaques MitM. Impact élevé pour la confidentialité et l'intégrité des sessions.</p>
-
-    <h2>3. Recommandations de mitigation &amp; hardening</h2>
+    <h2>2. Recommandations</h2>
     <ol>
-      <li><strong>Migration vers HTTPS :</strong> Installer un certificat TLS (Let's Encrypt) et activer TLS 1.2+ / TLS 1.3 uniquement.</li>
-      <li><strong>Redirection stricte :</strong> Configurer redirection 301 de HTTP → HTTPS et activer HSTS (Header Strict-Transport-Security) pour forcer l'usage de TLS.</li>
-      <li><strong>Configuration du serveur :</strong> Sur Nginx/Apache, désactiver SSLv3/TLS1.0/TLS1.1, utiliser ciphers modernes (AEAD), et activer Perfect Forward Secrecy (PFS).</li>
-      <li><strong>Renouvellement automatisé :</strong> Automatiser le renouvellement du certificat (Certbot) pour éviter l'expiration.</li>
-      <li><strong>Tests et audits :</strong> Scanner le site via SSL Labs et corriger les faiblesses, surveiller les logs et configurer alertes SIEM pour anomalies réseau.</li>
+      <li>Migration vers HTTPS (Let's Encrypt), activer TLS 1.2+ / 1.3.</li>
+      <li>Redirection 301 HTTP → HTTPS et HSTS.</li>
+      <li>Désactiver protocoles obsolètes et configurer ciphers modernes.</li>
     </ol>
 
-    <h2>4. Ce que montre ce projet</h2>
-    <p>Compétences démontrées : lecture de tcpdump, identification de trafic non chiffré, recommandations de durcissement serveur, connaissance TLS/HSTS, et bonnes pratiques de déploiement.</p>
-
-    <p>Envie d'ajouter des captures tcpdump, commandes utilisées (tcpdump -r, tshark) ou extraits de configuration Nginx ? Je peux les insérer dans la page.</p>
+    <p>Envie d'ajouter des captures tcpdump, commandes utilisées ou extraits de configuration Nginx ? Envoie-les et je les intègre.</p>
   </div>
 </body>
 </html>

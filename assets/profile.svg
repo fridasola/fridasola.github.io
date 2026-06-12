@@ -1,6 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
-  <rect width="100%" height="100%" fill="#2b6cb0"/>
-  <circle cx="100" cy="70" r="40" fill="#fff"/>
-  <rect x="30" y="120" width="140" height="50" rx="8" fill="#fff"/>
-  <text x="100" y="155" font-family="Arial, sans-serif" font-size="28" fill="#2b6cb0" text-anchor="middle">EN</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 8 8" shape-rendering="crispEdges">
+  <!-- simple 8x8 pixel avatar: hair (purple), face (peach), shirt (pink) -->
+  <rect x="0" y="0" width="8" height="8" fill="#ffdff2"/>
+  <!-- hair -->
+  <rect x="1" y="0" width="6" height="2" fill="#b24da8"/>
+  <rect x="0" y="2" width="2" height="1" fill="#b24da8"/>
+  <rect x="6" y="2" width="2" height="1" fill="#b24da8"/>
+  <!-- face -->
+  <rect x="2" y="2" width="4" height="3" fill="#ffd4b8"/>
+  <!-- eyes -->
+  <rect x="3" y="3" width="1" height="1" fill="#2b1b2d"/>
+  <rect x="4" y="3" width="1" height="1" fill="#2b1b2d"/>
+  <!-- mouth -->
+  <rect x="3" y="4" width="2" height="1" fill="#b24da8"/>
+  <!-- shirt -->
+  <rect x="0" y="5" width="8" height="3" fill="#f59ec9"/>
 </svg>
