@@ -10,28 +10,45 @@
 <body class="retro">
   <div class="container pixel-card">
     <a href="/">← Retour au portfolio</a>
-    <h1 class="pixel-title">Investigation Réseau &amp; Durcissement</h1>
+    <h1 class="pixel-title">Investigation Réseau &amp; Durcissement — yummyrecipesforme</h1>
     <p><strong>Origine :</strong> Activité réalisée dans le cadre de la certification Google en cybersécurité.</p>
 
-    <h2>Résumé</h2>
-    <p>Analyse d'un extrait tcpdump montrant des connexions HTTP (port 80) vers <em>yummyrecipesforme.com</em>. Identification d'un risque MitM et recommandation de migration vers HTTPS et durcissement TLS.</p>
+    <h2>Section 1 : Protocole réseau identifié (Étape 3)</h2>
+    <p>Deux protocoles de la couche application ont été observés dans les journaux et en sandbox :</p>
+    <ul>
+      <li><strong>HTTP</strong> — pages web non chiffrées de <em>yummyrecipesforme.com</em> et du domaine malveillant <em>greatrecipesforme.com</em> (port 80).</li>
+      <li><strong>DNS</strong> — résolution de noms menant aux adresses IP des serveurs (requêtes/réponses).</li>
+    </ul>
 
-    <h2>Découverte technique</h2>
-    <pre><code>14:23:10.104512 IP user-laptop.49152 &gt; yummyrecipesforme.com.http: Flags [S], seq 123456
-14:23:10.142105 IP yummyrecipesforme.com.http &gt; user-laptop.49152: Flags [S.], ack 123457
-14:23:10.142512 IP user-laptop.49152 &gt; yummyrecipesforme.com.http: Flags [.], ack 1
-</code></pre>
+    <h2>Section 2 : Documentation de l'incident (Étape 4)</h2>
+    <p><strong>Résumé :</strong> Le serveur hébergeant <em>yummyrecipesforme.com</em> a été compromis via une attaque par force brute exploitant un mot de passe administratif par défaut. L'attaquant a accédé au panneau d'administration, injecté un script JavaScript malveillant et changé le mot de passe administrateur.</p>
 
-    <h2>Recommandations</h2>
+    <p><strong>Impact et comportement :</strong> Le script invitait les visiteurs à télécharger un exécutable déguisé. Après exécution, le malware modifiait la résolution DNS locale ou redirigeait les requêtes HTTP vers <em>greatrecipesforme.com</em>, provoquant ralentissements et redirections malveillantes.</p>
+
+    <p><strong>Sources et preuves :</strong></p>
+    <ul>
+      <li>Signalements clients (emails au support).</li>
+      <li>Analyses en sandbox reproduisant la redirection après exécution du binaire malveillant.</li>
+      <li>Journaux tcpdump montrant séquences HTTP et DNS avant et après le téléchargement.</li>
+      <li>Examen du code source confirmant l'injection JavaScript dans l'administration.</li>
+    </ul>
+
+    <h2>Section 3 : Recommandations correctives (Étape 5)</h2>
+    <p><strong>Mesure recommandée :</strong> Imposer l'Authentification à Deux Facteurs (2FA) et forcer le changement des mots de passe par défaut.</p>
+    <p><strong>Pourquoi :</strong> Le 2FA empêche l'accès même si le mot de passe est compromis par force brute. Exiger la suppression/modification des identifiants par défaut élimine la vulnérabilité initiale exploitée.</p>
+
+    <h3>Actions complémentaires suggérées</h3>
     <ol>
-      <li>Installer TLS via Let's Encrypt et forcer HTTPS (port 443).</li>
-      <li>Activer HSTS et désactiver TLS/SSL obsolètes.</li>
-      <li>Scanner via SSL Labs et automatiser le renouvellement Certbot.</li>
+      <li>Forcer la rotation de tous les mots de passe administratifs et désactiver les comptes inactifs.</li>
+      <li>Activer les protections anti‑brute force (rate limiting, verrouillage, captcha, logs d'IP).</li>
+      <li>Scanner et nettoyer le code source, restaurer depuis une sauvegarde fiable si nécessaire.</li>
+      <li>Mettre en place une surveillance SIEM et alertes sur modifications de code et téléchargements suspects.</li>
+      <li>Forcer l'usage de HTTPS/TLS côté client et serveur (Let's Encrypt + HSTS) pour protéger les utilisateurs contre le MitM.</li>
     </ol>
 
     <p>Référence certification Google: <a href="https://www.coursera.org/professional-certificates/google-cybersecurity">Google Cybersecurity Professional Certificate</a></p>
 
-    <p class="meta">Voir aussi : <a href="/projects/cacaomood.html">CacaoMood — Moteur de Recherche Hybride</a></p>
+    <p class="meta">Voir aussi : <a href="/projects/cacaomood.html">CacaoMood — Moteur de Recherche Hybride (Data/AI)</a></p>
   </div>
 </body>
 </html>
