@@ -1,16 +1,13 @@
 Portfolio pour Emily NOLE (fridasola)
 
-Design : thème girly rétro pixel-art.
+Organisation : les projets Data/AI et Cybersécurité sont séparés pour clarifier les compétences.
 
-Ce dépôt contient un portfolio simple et une page projet détaillée : "Analyse de Trafic Réseau & Durcissement de Serveur Web" (yummyrecipesforme).
+Projets:
+- Investigation Réseau & Durcissement (SOC) — page: projects/yummyrecipes.html. Origine: activité de la certification Google en cybersécurité.
+- CacaoMood — Moteur de Recherche Hybride (Data/AI) — page: projects/cacaomood.html. Origine: cours Microsoft Learn "Concevoir et mettre en œuvre des solutions de recherche intelligente et RAG en SQL".
 
-Installation locale:
-1. Cloner le dépôt.
-2. Ajouter la photo de profil en remplaçant `assets/profile.svg` si souhaité.
-3. Remplacer les placeholders des autres projets dans `index.html` par vos titres, descriptions, liens et images.
-4. Commit et push sur GitHub.
+Ressources:
+- Cours Microsoft Learn: https://learn.microsoft.com/
+- Google Cybersecurity Professional Certificate (exemple d'activité): https://www.coursera.org/professional-certificates/google-cybersecurity
 
-Publication (GitHub Pages):
-- Le site est prêt pour GitHub Pages : https://fridasola.github.io/
-
-Pour ajouter du contenu du projet (captations tcpdump, config Nginx, captures d'écran), envoyez les fichiers ou directives et j'ajoute ça proprement.
+Pour modifier le site localement : clonez le dépôt, éditez les fichiers HTML/CSS et poussez. Le site est prêt pour GitHub Pages: https://fridasola.github.io/
