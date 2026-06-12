@@ -10,4 +10,6 @@ Ressources:
 - Cours Microsoft Learn: https://learn.microsoft.com/
 - Google Cybersecurity Professional Certificate (exemple d'activité): https://www.coursera.org/professional-certificates/google-cybersecurity
 
-Pour modifier le site localement : clonez le dépôt, éditez les fichiers HTML/CSS et poussez. Le site est prêt pour GitHub Pages: https://fridasola.github.io/
+Le site est prêt pour GitHub Pages : https://fridasola.github.io/
+
+Pour modifier le site localement : clonez le dépôt, éditez les fichiers HTML/CSS et poussez.
