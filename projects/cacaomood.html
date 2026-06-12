@@ -3,83 +3,86 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>CacaoMood — Moteur de Recherche Hybride</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../styles.css">
+  <title>CacaoMood — Cas d'Étude RAG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
 </head>
-<body class="retro">
-  <div class="container pixel-card">
-    <a href="/">← Retour au portfolio</a>
-    <h1 class="pixel-title">CacaoMood — Moteur de Recherche Hybride</h1>
-    <p><strong>Origine :</strong> Cours Microsoft « Concevoir et mettre en œuvre des solutions de recherche intelligente et RAG en SQL » (Microsoft Learn).</p>
+<body>
+  <div class="container">
+    <div class="pixel-card">
+      <h1 class="pixel-title">🍫 CacaoMood — Implémentation d'une solution RAG</h1>
+      <p class="meta">Rôle : Développeuse bases de données &amp; Ingénieure IA · Temps estimé : 45 minutes</p>
 
-    <h2>Contexte &amp; Problématique</h2>
-    <p>Plateforme e‑commerce spécialisée dans le cacao. Besoin de servir à la fois des recherches précises (par référence, origine) et des recherches sémantiques (mood, bienfaits).</p>
+      <h2>Contexte &amp; Objectif</h2>
+      <p>CacaoMood est une plateforme e‑commerce et holistique. Objectif : créer un assistant virtuel recommandant des rituels de cacao en s'appuyant uniquement sur le catalogue produit (grounding strict) pour éviter les hallucinations.</p>
 
-    <h2>Architecture technique</h2>
-    <ul>
-      <li>Pipeline Textuel : Indexation Full‑Text (précision)</li>
-      <li>Pipeline Sémantique : Embeddings + recherche vectorielle (rappel)</li>
-      <li>Fusion des scores : Algorithme RRF + stratégie d'oversampling avant post‑filtrage</li>
-    </ul>
+      <h2>Étapes clés</h2>
+      <ol>
+        <li><strong>Infrastructure relationnelle</strong> — Tables produit + colonne vectorielle native VECTOR(1536) pour les embeddings.</li>
+        <li><strong>Sécurité &amp; modèles externes</strong> — Identity Managed pour Azure OpenAI ; déclaration d'un MODEL externe pour embeddings.</li>
+        <li><strong>Vectorisation par lots</strong> — Script T‑SQL robuste avec batching, pause et retry en cas de rate‑limit.</li>
+        <li><strong>Indexation DiskANN</strong> — Index vectoriel ANN (DiskANN) pour recherche rapide.</li>
+        <li><strong>Procédure stockée RAG</strong> — dbo.AskCacaoQuestion : retrieval (VECTOR_SEARCH), augmentation (FOR JSON) et génération via sp_invoke_external_rest_endpoint.</li>
+      </ol>
 
-    <h2>Schéma T‑SQL</h2>
-    <pre><code>CREATE TABLE dbo.CacaoProducts
-(
-    ProductID INT PRIMARY KEY,
+      <h2>Extraits SQL (principaux éléments)</h2>
+      <p>Création des tables et colonne vectorielle :</p>
+      <pre><code>-- Création des tables
+CREATE TABLE dbo.ProductBenefits (
+    BenefitID INT IDENTITY(1,1) PRIMARY KEY,
+    BenefitName VARCHAR(100) NOT NULL,
+    TargetMood VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE dbo.CacaoProducts (
+    ProductID INT IDENTITY(1,1) PRIMARY KEY,
     ProductName NVARCHAR(150) NOT NULL,
     OriginCountry NVARCHAR(100) NOT NULL,
-    BenefitType NVARCHAR(100) NOT NULL,
     Description NVARCHAR(MAX) NOT NULL,
-    CacaoVector VECTOR(1536) NOT NULL
+    Price DECIMAL(5,2) NOT NULL,
+    BenefitID INT FOREIGN KEY REFERENCES dbo.ProductBenefits(BenefitID),
+    CacaoVector VECTOR(1536) NULL
 );
 </code></pre>
 
-    <h2>Requête Hybride (RRF + oversampling)</h2>
-    <pre><code>DECLARE @userInputText NVARCHAR(1000) = 'remplacer mon café du matin sans stress et avec de la douceur';
-DECLARE @userQueryVector VECTOR(1536) = '[0.012, -0.043, ...]';
-DECLARE @rrfK INT = 60;
-DECLARE @topN INT = 50;
-
-WITH keyword_search AS (
-    SELECT TOP(@topN) p.ProductID,
-        RANK() OVER (ORDER BY ftt.[RANK] DESC) AS keyword_rank
-    FROM dbo.CacaoProducts p
-    INNER JOIN FREETEXTTABLE(dbo.CacaoProducts, Description, @userInputText) AS ftt 
-        ON p.ProductID = ftt.[KEY]
-),
-vector_search AS (
-    SELECT TOP(@topN) t.ProductID,
-        RANK() OVER (ORDER BY s.distance) AS vector_rank
-    FROM VECTOR_SEARCH(
-        TABLE = dbo.CacaoProducts AS t,
-        COLUMN = CacaoVector,
-        SIMILAR_TO = @userQueryVector,
-        METRIC = 'cosine',
-        TOP_N = @topN
-    ) AS s
-),
-combined AS (
-    SELECT TOP(10)
-        COALESCE(ks.ProductID, vs.ProductID) AS ProductID,
-        COALESCE(1.0 / (@rrfK + ks.keyword_rank), 0.0) +
-        COALESCE(1.0 / (@rrfK + vs.vector_rank), 0.0) AS rrf_score
-    FROM keyword_search ks
-    FULL OUTER JOIN vector_search vs ON ks.ProductID = vs.ProductID
-)
-SELECT p.ProductName, p.OriginCountry, p.BenefitType, c.rrf_score
-FROM combined c
-INNER JOIN dbo.CacaoProducts p ON c.ProductID = p.ProductID
-WHERE p.BenefitType = 'Énergie'
-ORDER BY c.rrf_score DESC;
+      <p>Vectorisation batch (extrait) :</p>
+      <pre><code>DECLARE @batchSize INT = 30;
+WHILE @rowsUpdated &gt; 0
+BEGIN
+  UPDATE TOP (@batchSize) p
+  SET p.CacaoVector = AI_GENERATE_EMBEDDINGS(
+    p.ProductName + ' | Origine: ' + p.OriginCountry + ' | Bienfaits: ' + b.BenefitName + ' | ' + p.Description
+    USE MODEL my_embedding_model
+  )
+  FROM dbo.CacaoProducts p
+  INNER JOIN dbo.ProductBenefits b ON p.BenefitID = b.BenefitID
+  WHERE p.CacaoVector IS NULL;
+END;
 </code></pre>
 
-    <h2>Ce que démontre ce projet</h2>
-    <p>Compétences : architecture de données, embeddings, SQL avancé, recherche vectorielle, fusion de scores, RAG.</p>
+      <p>Création de l'index DiskANN :</p>
+      <pre><code>CREATE VECTOR INDEX IX_CacaoProducts_CacaoVector
+ON dbo.CacaoProducts(CacaoVector)
+WITH (METRIC = 'cosine', TYPE = 'DISKANN');
+</code></pre>
 
-    <p>Référence cours Microsoft Learn: <a href="https://learn.microsoft.com/">Microsoft Learn</a></p>
+      <p>Procédure stockée RAG (résumé) : vectoriser la question, récupérer TOP 3 via VECTOR_SEARCH, packer le contexte en JSON et appeler l'API Azure OpenAI avec sp_invoke_external_rest_endpoint. Gestion d'erreurs et messages système pour ancrage strict.</p>
 
-    <p class="meta">Voir aussi : <a href="/projects/yummyrecipes.html">Investigation Réseau &amp; Durcissement</a></p>
+      <h2>Tests &amp; Recette</h2>
+      <p>Tests exemples inclus (exécuter dbo.AskCacaoQuestion avec des questions clients). Résultat attendu : sélection pertinente des produits (Aurore Énergisante, Sérénité du Soir) et réponses ancrées, concises et non‑hallucinées.</p>
+
+      <h2>Points d'attention &amp; bonnes pratiques</h2>
+      <ul>
+        <li>Utiliser identity managed pour éviter stockage de secrets.</li>
+        <li>Imposer temperature basse (0.3) et instructions système strictes pour le grounding.</li>
+        <li>Mettre en place monitoring des latences et quotas Azure OpenAI (retry/backoff).</li>
+        <li>Valider les données catalogue (prix, disponibilité) avant injection dans le prompt.</li>
+      </ul>
+
+      <p class="meta">Compétences : SQL avancé, embeddings, index vectoriel, RAG, Azure OpenAI</p>
+
+      <p><a class="pixel-link" href="/">← Retour</a></p>
+    </div>
   </div>
 </body>
 </html>
