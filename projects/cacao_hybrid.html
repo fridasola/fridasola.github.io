@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CacaoMood — Moteur de Recherche Hybride</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container">
+    <div class="pixel-card">
+      <h1 class="pixel-title">🍫 Cas d'Étude : Moteur de Recherche Hybride "CacaoMood"</h1>
+      <p class="meta">Domaine : E‑Commerce Wellness · Rôle : Data Architect · Technologies : Azure SQL, Azure OpenAI, T‑SQL</p>
+
+      <h2>1. Contexte &amp; Problématique</h2>
+      <p>Les clients recherchent à la fois par mots‑clés (origine, pourcentage) et par intentions/mood (ex: "remplacer mon café sans anxiété"). Une recherche textuelle classique échoue souvent pour les intentions sémantiques ; la solution combine Full‑Text + Vectoriel.</p>
+
+      <h2>2. Architecture technique</h2>
+      <ul>
+        <li><strong>Pipeline Textuel (Précision)</strong> : Index Full‑Text (BM25) pour les correspondances exactes.</li>
+        <li><strong>Pipeline Sémantique (Rappel)</strong> : Embeddings 1536‑D + VECTOR_SEARCH (DiskANN) pour similarité cosinus.</li>
+        <li><strong>Fusion Hybride</strong> : RRF (Reciprocal Rank Fusion) + Oversampling TOP_N avant post‑filtrage.</li>
+      </ul>
+
+      <h2>3. Modèle de données (T‑SQL)</h2>
+      <pre><code>CREATE TABLE dbo.CacaoProducts
+(
+    ProductID INT PRIMARY KEY,
+    ProductName NVARCHAR(150) NOT NULL,
+    OriginCountry NVARCHAR(100) NOT NULL,
+    BenefitType NVARCHAR(100) NOT NULL,
+    Description NVARCHAR(MAX) NOT NULL,
+    CacaoVector VECTOR(1536) NOT NULL
+);
+</code></pre>
+
+      <h2>4. Requête Hybride (RRF + Oversampling)</h2>
+      <p>Le bloc ci‑dessous montre la stratégie : obtenir TOP_N via VECTOR_SEARCH, fusionner avec FREETEXTTABLE et appliquer RRF pour classer les résultats.</p>
+
+      <details>
+        <summary><strong>SQL : Requête hybride RRF (exemple)</strong></summary>
+        <pre><code>DECLARE @userInputText NVARCHAR(1000) = 'remplacer mon café du matin sans stress et avec de la douceur';
+DECLARE @userQueryVector VECTOR(1536) = '[0.012, -0.043, ...]'; -- Généré via l'API d'embeddings
+DECLARE @rrfK INT = 60;
+DECLARE @topN INT = 50;
+
+WITH keyword_search AS (
+    SELECT TOP(@topN) p.ProductID,
+        RANK() OVER (ORDER BY ftt.[RANK] DESC) AS keyword_rank
+    FROM dbo.CacaoProducts p
+    INNER JOIN FREETEXTTABLE(dbo.CacaoProducts, Description, @userInputText) AS ftt 
+        ON p.ProductID = ftt.[KEY]
+),
+vector_search AS (
+    SELECT TOP(@topN) t.ProductID,
+        RANK() OVER (ORDER BY s.distance) AS vector_rank
+    FROM VECTOR_SEARCH(
+        TABLE = dbo.CacaoProducts AS t,
+        COLUMN = CacaoVector,
+        SIMILAR_TO = @userQueryVector,
+        METRIC = 'cosine',
+        TOP_N = @topN
+    ) AS s
+),
+combined AS (
+    SELECT TOP(10)
+        COALESCE(ks.ProductID, vs.ProductID) AS ProductID,
+        COALESCE(1.0 / (@rrfK + ks.keyword_rank), 0.0) +
+        COALESCE(1.0 / (@rrfK + vs.vector_rank), 0.0) AS rrf_score
+    FROM keyword_search ks
+    FULL OUTER JOIN vector_search vs ON ks.ProductID = vs.ProductID
+)
+SELECT p.ProductName, p.OriginCountry, p.BenefitType, c.rrf_score
+FROM combined c
+INNER JOIN dbo.CacaoProducts p ON c.ProductID = p.ProductID
+WHERE p.BenefitType = 'Énergie'
+ORDER BY c.rrf_score DESC;
+</code></pre>
+      </details>
+
+      <h2>5. Bonnes pratiques</h2>
+      <ul>
+        <li>Sur‑échantillonnage (TOP_N élevé) avant post‑filtre pour ne pas perdre pertinence.</li>
+        <li>Métriques cosinus pour embeddings, BM25 pour texte.</li>
+        <li>Mesurer latence et qualité (p@k, mrr) et ajuster rrf_k et topN.</li>
+      </ul>
+
+      <p class="meta">Compétences : Architecture hybride, embeddings, RRF, T‑SQL avancé</p>
+
+      <p><a class="pixel-link" href="/projects/cacao_hybrid_full.sql" download>📥 Télécharger le SQL complet</a> • <a class="pixel-link" href="/">← Retour</a></p>
+    </div>
+  </div>
+</body>
+</html>
