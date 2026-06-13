@@ -3,86 +3,288 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>CacaoMood — Moteur de Recherche Hybride</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../styles.css">
+  <title>CacaoMood — Cas d'Étude RAG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
 </head>
-<body class="retro">
-  <div class="container pixel-card">
-    <a href="/">← Retour au portfolio</a>
-    <h1 class="pixel-title">CacaoMood — Moteur de Recherche Hybride</h1>
-    <p><strong>Origine :</strong> Cours Microsoft « Concevoir et mettre en œuvre des solutions de recherche intelligente et RAG en SQL » (Microsoft Learn).</p>
+<body>
+  <div class="container">
+    <div class="pixel-card">
+      <h1 class="pixel-title">🍫 CacaoMood — Implémentation d'une solution RAG</h1>
+      <p class="meta">Rôle : Développeuse bases de données &amp; Ingénieure IA · Temps estimé : 45 minutes</p>
 
-    <h2>Contexte &; Problématique</h2>
-    <p>Plateforme e‑commerce spécialisée dans le cacao. Besoin de servir à la fois des recherches précises (par référence, origine) et des recherches sémantiques (mood, bienfaits).</p>
+      <h2>Contexte &amp; Objectif</h2>
+      <p>CacaoMood est une plateforme e‑commerce et holistique. Objectif : créer un assistant virtuel recommandant des rituels de cacao en s'appuyant uniquement sur le catalogue produit (grounding strict) pour éviter les hallucinations.</p>
 
-    <h2>Architecture technique</h2>
-    <ul>
-      <li>Pipeline Textuel : Indexation Full‑Text (précision)</li>
-      <li>Pipeline Sémantique : Embeddings + recherche vectorielle (rappel)</li>
-      <li>Fusion des scores : Algorithme RRF + stratégie d'oversampling avant post‑filtrage</li>
-    </ul>
+      <h2>Étapes clés</h2>
+      <ol>
+        <li><strong>Infrastructure relationnelle</strong> — Tables produit + colonne vectorielle native VECTOR(1536) pour les embeddings.</li>
+        <li><strong>Sécurité &amp; modèles externes</strong> — Identity Managed pour Azure OpenAI ; déclaration d'un MODEL externe pour embeddings.</li>
+        <li><strong>Vectorisation par lots</strong> — Script T‑SQL robuste avec batching, pause et retry en cas de rate‑limit.</li>
+        <li><strong>Indexation DiskANN</strong> — Index vectoriel ANN (DiskANN) pour recherche rapide.</li>
+        <li><strong>Procédure stockée RAG</strong> — dbo.AskCacaoQuestion : retrieval (VECTOR_SEARCH), augmentation (FOR JSON) et génération via sp_invoke_external_rest_endpoint.</li>
+      </ol>
 
-    <h2>Schéma T‑SQL</h2>
-    <pre><code>CREATE TABLE dbo.CacaoProducts
-(
-    ProductID INT PRIMARY KEY,
+      <h2>SQL complet (collapsible)</h2>
+
+      <details>
+        <summary><strong>1) Suppression & création des tables + insertion (catalogue)</strong></summary>
+        <button class="copy-btn" data-target="sql-1">Copier le SQL</button>
+        <pre id="sql-1"><code>-- Suppression des tables si elles existent pour repartir à neuf
+DROP TABLE IF EXISTS dbo.CacaoProducts;
+DROP TABLE IF EXISTS dbo.ProductBenefits;
+GO
+
+-- 1. Création de la table des Bienfaits / Rituels
+CREATE TABLE dbo.ProductBenefits (
+    BenefitID INT IDENTITY(1,1) PRIMARY KEY,
+    BenefitName VARCHAR(100) NOT NULL,
+    TargetMood VARCHAR(100) NOT NULL
+);
+
+-- 2. Création de la table des Produits Cacao avec la colonne Vectorielle
+CREATE TABLE dbo.CacaoProducts (
+    ProductID INT IDENTITY(1,1) PRIMARY KEY,
     ProductName NVARCHAR(150) NOT NULL,
     OriginCountry NVARCHAR(100) NOT NULL,
-    BenefitType NVARCHAR(100) NOT NULL,
     Description NVARCHAR(MAX) NOT NULL,
-    CacaoVector VECTOR(1536) NOT NULL
+    Price DECIMAL(5,2) NOT NULL,
+    BenefitID INT FOREIGN KEY REFERENCES dbo.ProductBenefits(BenefitID),
+    CacaoVector VECTOR(1536) NULL -- 1536 dimensions pour correspondre au modèle text-embedding-3-small
 );
-</code></pre>
+GO
 
-    <h2>Requête Hybride (RRF + oversampling)</h2>
-    <pre><code>DECLARE @userInputText NVARCHAR(1000) = 'remplacer mon café du matin sans stress et avec de la douceur';
-DECLARE @userQueryVector VECTOR(1536) = '[0.012, -0.043, ...]';
-DECLARE @rrfK INT = 60;
-DECLARE @topN INT = 50;
-DECLARE @targetBenefit NVARCHAR(100) = 'Énergie';
+-- 3. Insertion du jeu de données (Le catalogue holistique)
+INSERT INTO dbo.ProductBenefits (BenefitName, TargetMood) VALUES 
+('Rituel du Matin &amp; Énergie', 'Concentration, Vitalité sans stress'),
+('Rituel du Soir &amp; Détente', 'Relaxation, Sommeil profond, Anti-anxiété'),
+('Ancrage &amp; Méditation Chamanique', 'Pleine conscience, Connexion spirituelle');
 
-WITH keyword_search AS (
-    SELECT TOP(@topN) p.ProductID,
-        RANK() OVER (ORDER BY ftt.[RANK] DESC) AS keyword_rank
-    FROM dbo.CacaoProducts p
-    INNER JOIN FREETEXTTABLE(dbo.CacaoProducts, Description, @userInputText) AS ftt 
-        ON p.ProductID = ftt.[KEY]
-    WHERE p.BenefitType = @targetBenefit
-),
-vector_search AS (
-    SELECT TOP(@topN) t.ProductID,
-        RANK() OVER (ORDER BY s.distance) AS vector_rank
-    FROM VECTOR_SEARCH(
-        TABLE dbo.CacaoProducts,
-        COLUMN CacaoVector,
-        SIMILAR_TO @userQueryVector,
-        METRIC 'cosine',
-        TOP_N @topN
-    ) AS s
-    INNER JOIN dbo.CacaoProducts p ON s.ProductID = p.ProductID
-    WHERE p.BenefitType = @targetBenefit
-),
-combined AS (
-    SELECT TOP(10)
-        COALESCE(ks.ProductID, vs.ProductID) AS ProductID,
-        COALESCE(1.0 / (@rrfK + ks.keyword_rank), 0.0) +
-        COALESCE(1.0 / (@rrfK + vs.vector_rank), 0.0) AS rrf_score
-    FROM keyword_search ks
-    FULL OUTER JOIN vector_search vs ON ks.ProductID = vs.ProductID
-)
-SELECT TOP(10) p.ProductName, p.OriginCountry, p.BenefitType, c.rrf_score
-FROM combined c
-INNER JOIN dbo.CacaoProducts p ON c.ProductID = p.ProductID
-ORDER BY c.rrf_score DESC;
-</code></pre>
+INSERT INTO dbo.CacaoProducts (ProductName, OriginCountry, Description, Price, BenefitID) VALUES
+(N'« Élixir Cacao Sacré »', N'Pérou', N'Un cacao de variété Criollo, idéal pour l''ancrage spirituel lors des méditations. Offre des notes terreuses et une douceur qui apaise l''esprit sans caféine agressive.', 29.99, 3),
+(N'Aurore Énergisante', N'Équateur', N'Alternative douce et parfaite au café pour le matin. Enrichi aux épices douces, il stimule la concentration et réveille le corps en douceur pour un rituel sans stress.', 24.50, 1),
+(N'Sérénité du Soir', N'Madagascar', N'Cacao extra-fin aux notes florales et de vanille. Conçu spécifiquement pour le rituel de fin de journée, il aide à relâcher l''anxiété et prépare à un sommeil profond.', 27.00, 2);
+GO</code></pre>
+      </details>
 
-    <h2>Ce que démontre ce projet</h2>
-    <p>Compétences : architecture de données, embeddings, SQL avancé, recherche vectorielle, fusion de scores, RAG.</p>
+      <details>
+        <summary><strong>2) Sécurité &amp; Configuration des modèles externes (Identity Managed)</strong></summary>
+        <button class="copy-btn" data-target="sql-2">Copier le SQL</button>
+        <pre id="sql-2"><code>-- 1. Création de la clé maîtresse de chiffrement de la base (si inexistante)
+IF NOT EXISTS (SELECT * FROM sys.symmetric_keys WHERE name = '##MS_DatabaseMasterKey##')
+BEGIN
+    CREATE MASTER KEY ENCRYPTION BY PASSWORD 'TonMotDePasseFortEtSecurise123!';
+END;
+GO
 
-    <p>Référence cours Microsoft Learn: <a href="https://learn.microsoft.com/">Microsoft Learn</a></p>
+-- 2. Création de l'identifiant lié à l'Identité Managée du serveur SQL
+-- Note : Le resourceid est l'audience fixe mondiale d'Azure Cognitive Services (ne pas modifier)
+CREATE DATABASE SCOPED CREDENTIAL [https://cacaomood-openai.openai.azure.com]
+WITH IDENTITY = 'Managed Identity', 
+SECRET = '{"resourceid": "https://cognitiveservices.azure.com"}';
+GO
 
-    <p class="meta">Voir aussi : <a href="/projects/yummyrecipes.html">Investigation Réseau &amp; Durcissement</a></p>
+-- 3. Déclaration du modèle externe pour la génération d'embeddings
+CREATE EXTERNAL MODEL my_embedding_model
+WITH (
+    LOCATION = 'https://cacaomood-openai.openai.azure.com/openai/deployments/text-embedding-3-small/embeddings?api-version=2024-10-21',
+    API_FORMAT = 'Azure OpenAI',
+    MODEL_TYPE = EMBEDDINGS,
+    MODEL = 'text-embedding-3-small',
+    CREDENTIAL = [https://cacaomood-openai.openai.azure.com]
+);
+GO</code></pre>
+      </details>
+
+      <details>
+        <summary><strong>3) Vectorisation automatique par lots (batching + retry)</strong></summary>
+        <button class="copy-btn" data-target="sql-3">Copier le SQL</button>
+        <pre id="sql-3"><code>DECLARE @batchSize INT = 30; -- Taille des lots de traitement
+DECLARE @rowsUpdated INT = 1;
+DECLARE @retryCount INT;
+DECLARE @maxRetries INT = 3;
+
+WHILE @rowsUpdated &gt; 0
+BEGIN
+    SET @retryCount = 0;
+    
+    RETRY_BATCH:
+    BEGIN TRY
+        -- Mise à jour sémantique en combinant les colonnes textuelles clés
+        UPDATE TOP (@batchSize) p
+        SET p.CacaoVector = AI_GENERATE_EMBEDDINGS(
+            p.ProductName + ' | Origine: ' + p.OriginCountry + ' | Bienfaits: ' + b.BenefitName + ' | ' + p.Description
+            USE MODEL my_embedding_model
+        )
+        FROM dbo.CacaoProducts p
+        INNER JOIN dbo.ProductBenefits b ON p.BenefitID = b.BenefitID
+        WHERE p.CacaoVector IS NULL; -- Ne traite que les lignes non vectorisées
+        
+        SET @rowsUpdated = @@ROWCOUNT;
+
+        -- Courte pause pour respecter les limites de l'API Azure OpenAI
+        IF @rowsUpdated &gt; 0
+        BEGIN
+            WAITFOR DELAY '00:00:02';
+        END
+    END TRY
+    BEGIN CATCH
+        SET @retryCount += 1;
+        IF @retryCount &lt;= @maxRetries
+        BEGIN
+            PRINT 'Limite de requêtes atteinte (Rate limited). Réessai dans 5 secondes... Tentative ' + CAST(@retryCount AS VARCHAR(2));
+            WAITFOR DELAY '00:00:05';
+            GOTO RETRY_BATCH;
+        END
+        ELSE
+        BEGIN
+            THROW; -- Lève l'exception si le problème persiste après 3 tentatives
+        END
+    END CATCH
+END;
+GO
+
+-- Vérification de la réussite de l'opération
+SELECT COUNT(*) AS TotalCacaos, COUNT(CacaoVector) AS CacaosVectorises 
+FROM dbo.CacaoProducts;
+GO</code></pre>
+      </details>
+
+      <details>
+        <summary><strong>4) Activation index DiskANN</strong></summary>
+        <button class="copy-btn" data-target="sql-4">Copier le SQL</button>
+        <pre id="sql-4"><code>-- 1. Activation des fonctionnalités en preview requises pour l'indexation vectorielle
+ALTER DATABASE SCOPED CONFIGURATION SET PREVIEW_FEATURES = ON;
+GO
+
+-- 2. Option essentielle : Empêcher la table de passer en mode "Lecture Seule"
+ALTER DATABASE SCOPED CONFIGURATION SET ALLOW_STALE_VECTOR_INDEX = ON;
+GO
+
+-- 3. Création de l'index vectoriel basé sur la similarité cosinus
+CREATE VECTOR INDEX IX_CacaoProducts_CacaoVector
+ON dbo.CacaoProducts(CacaoVector)
+WITH (METRIC = 'cosine', TYPE = 'DISKANN');
+GO</code></pre>
+      </details>
+
+      <details>
+        <summary><strong>5) Procédure stockée RAG (dbo.AskCacaoQuestion)</strong></summary>
+        <button class="copy-btn" data-target="sql-5">Copier le SQL</button>
+        <pre id="sql-5"><code>CREATE OR ALTER PROCEDURE dbo.AskCacaoQuestion
+    @Question NVARCHAR(1000),
+    @Answer NVARCHAR(MAX) OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @questionVector VECTOR(1536);
+    DECLARE @context NVARCHAR(MAX);
+    DECLARE @payload NVARCHAR(MAX);
+    DECLARE @response NVARCHAR(MAX);
+    DECLARE @returnValue INT;
+    
+    -- ÉTAPE 1 : Vectorisation instantanée de la question de la cliente
+    SELECT @questionVector = AI_GENERATE_EMBEDDINGS(@Question USE MODEL my_embedding_model);
+    
+    -- ÉTAPE 2 : Récupération sémantique des 3 meilleurs cacaos via l'index DiskANN (R)
+    SET @context = (
+        SELECT TOP 3 
+            p.ProductName AS [Cacao.Name], 
+            p.OriginCountry AS [Cacao.Origin], 
+            p.Price AS [Cacao.Price],
+            b.BenefitName AS [Cacao.Ritual],
+            p.Description AS [Cacao.Description]
+        FROM VECTOR_SEARCH(
+            TABLE = dbo.CacaoProducts AS p,
+            COLUMN = CacaoVector,
+            SIMILAR_TO = @questionVector,
+            METRIC = 'cosine',
+            TOP_N = 3
+        ) AS vs
+        INNER JOIN dbo.ProductBenefits b ON p.BenefitID = b.BenefitID
+        FOR JSON PATH
+    );
+    
+    -- Sécurité : Si aucun produit n'est retourné par l'index
+    IF @context IS NULL
+    BEGIN
+        SET @Answer = N'Désolé, je n''ai trouvé aucun cacao correspondant à votre rituel actuel dans notre catalogue. Pouvez-vous préciser votre recherche ?';
+        RETURN;
+    END;
+    
+    -- ÉTAPE 3 : Augmentation du prompt (A) - Définition des règles d'ancrage strictes (Grounding)
+    SET @payload = JSON_OBJECT(
+        'messages': JSON_ARRAY(
+            JSON_OBJECT(
+                'role': 'system', 
+                'content': N'Tu es l''assistante holistique experte pour la marque CacaoMood. Directives absolues :\\n1. Réponds aux questions des clientes en utilisant UNIQUEMENT les données du catalogue fournies.\\n2. Si les données fournies ne permettent pas de répondre, dis gentiment que tu dois valider auprès de l''équipe.\\n3. Ne crée JAMAIS de bienfaits, d''origines ou de prix imaginaires.\\n4. Garde un ton doux, chaleureux, axé sur le bien-être et réponds en moins de 150 mots.'
+            ),
+            JSON_OBJECT(
+                'role': 'user', 
+                'content': 'Catalogue disponible au format JSON : ' + @context + CHAR(10) + CHAR(10) + 'Question de la cliente : ' + @Question
+            )
+        ),
+        'max_tokens': 600,
+        'temperature': 0.3 -- Température basse pour éliminer la créativité et forcer la fidélité des prix et stocks
+    );
+    
+    -- ÉTAPE 4 : Envoi HTTPS direct au modèle Azure OpenAI (G)
+    EXECUTE @returnValue = sp_invoke_external_rest_endpoint
+        @url = N'https://cacaomood-openai.openai.azure.com/openai/deployments/gpt-5.4-mini/chat/completions?api-version=2024-10-21',
+        @method = 'POST',
+        @payload = @payload,
+        @credential = [https://cacaomood-openai.openai.azure.com],
+        @retry_count = 3, -- Gestion automatique des coupures réseau transitoires
+        @response = @response OUTPUT;
+    
+    -- ÉTAPE 5 : Extraction de la réponse rédigée ou traitement des erreurs d'infrastructure
+    IF @returnValue = 0
+    BEGIN
+        -- Extraction propre du contenu textuel du message généré par l'assistant
+        SET @Answer = JSON_VALUE(@response, '$.result.choices[0].message.content');
+    END
+    ELSE IF @returnValue = 429
+    BEGIN
+        SET @Answer = N'Notre guide holistique subit une forte affluence. Veuillez patienter quelques instants avant de formuler votre prochain rituel.';
+    END
+    ELSE
+    BEGIN
+        SET @Answer = N'Une connexion réseau instable empêche de joindre l''assistant IA. Statut technique de l''erreur : HTTP ' + CAST(@returnValue AS NVARCHAR(10));
+    END
+END;
+GO</code></pre>
+      </details>
+
+      <details>
+        <summary><strong>6) Tests &amp; Recette (exemples)</strong></summary>
+        <button class="copy-btn" data-target="sql-6">Copier le SQL</button>
+        <pre id="sql-6"><code>-- Test 1 : Demande pour un rituel sans stress du matin
+DECLARE @reponseApplication NVARCHAR(MAX);
+
+EXEC dbo.AskCacaoQuestion 
+    @Question = N'Je cherche une alternative douce au café pour mon rituel du matin sans stress',
+    @Answer = @reponseApplication OUTPUT;
+
+SELECT @reponseApplication AS [Assistant_CacaoMood_Output];
+GO
+
+-- Test 2 : Demande pour l'anxiété du soir
+DECLARE @reponseApplication2 NVARCHAR(MAX);
+
+EXEC dbo.AskCacaoQuestion 
+    @Question = N'Quel mélange me conseillez-vous pour décompresser le soir avant de dormir car je suis très anxieuse ?',
+    @Answer = @reponseApplication2 OUTPUT;
+
+SELECT @reponseApplication2 AS [Assistant_CacaoMood_Output];
+GO</code></pre>
+      </details>
+
+      <p class="meta">Compétences : SQL avancé, embeddings, index vectoriel, RAG, Azure OpenAI</p>
+
+      <p><a class="pixel-link" href="/projects/cacao_rag_full.sql" download>📥 Télécharger le SQL complet</a> • <a class="pixel-link" href="/">← Retour</a></p>
+    </div>
   </div>
+  <script src="/assets/copy.js"></script>
 </body>
 </html>
