@@ -40,6 +40,7 @@
 DECLARE @userQueryVector VECTOR(1536) = '[0.012, -0.043, ...]';
 DECLARE @rrfK INT = 60;
 DECLARE @topN INT = 50;
+DECLARE @targetBenefit NVARCHAR(100) = 'Énergie';
 
 WITH keyword_search AS (
     SELECT TOP(@topN) p.ProductID,
@@ -47,17 +48,20 @@ WITH keyword_search AS (
     FROM dbo.CacaoProducts p
     INNER JOIN FREETEXTTABLE(dbo.CacaoProducts, Description, @userInputText) AS ftt 
         ON p.ProductID = ftt.[KEY]
+    WHERE p.BenefitType = @targetBenefit
 ),
 vector_search AS (
     SELECT TOP(@topN) t.ProductID,
         RANK() OVER (ORDER BY s.distance) AS vector_rank
     FROM VECTOR_SEARCH(
-        TABLE = dbo.CacaoProducts AS t,
-        COLUMN = CacaoVector,
-        SIMILAR_TO = @userQueryVector,
-        METRIC = 'cosine',
-        TOP_N = @topN
+        TABLE dbo.CacaoProducts,
+        COLUMN CacaoVector,
+        SIMILAR_TO @userQueryVector,
+        METRIC 'cosine',
+        TOP_N @topN
     ) AS s
+    INNER JOIN dbo.CacaoProducts p ON s.ProductID = p.ProductID
+    WHERE p.BenefitType = @targetBenefit
 ),
 combined AS (
     SELECT TOP(10)
@@ -67,10 +71,9 @@ combined AS (
     FROM keyword_search ks
     FULL OUTER JOIN vector_search vs ON ks.ProductID = vs.ProductID
 )
-SELECT p.ProductName, p.OriginCountry, p.BenefitType, c.rrf_score
+SELECT TOP(10) p.ProductName, p.OriginCountry, p.BenefitType, c.rrf_score
 FROM combined c
 INNER JOIN dbo.CacaoProducts p ON c.ProductID = p.ProductID
-WHERE p.BenefitType = 'Énergie'
 ORDER BY c.rrf_score DESC;
 </code></pre>
 
