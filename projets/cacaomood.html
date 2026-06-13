@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CacaoMood — Moteur de Recherche Hybride</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="retro">
+  <div class="container pixel-card">
+    <a href="/">← Retour au portfolio</a>
+    <h1 class="pixel-title">CacaoMood — Moteur de Recherche Hybride</h1>
+    <p><strong>Origine :</strong> Cours Microsoft « Concevoir et mettre en œuvre des solutions de recherche intelligente et RAG en SQL » (Microsoft Learn).</p>
+
+    <h2>Contexte &amp; Problématique</h2>
+    <p>Plateforme e‑commerce spécialisée dans le cacao. Besoin de servir à la fois des recherches précises (par référence, origine) et des recherches sémantiques (mood, bienfaits).</p>
+
+    <h2>Architecture technique</h2>
+    <ul>
+      <li>Pipeline Textuel : Indexation Full‑Text (précision)</li>
+      <li>Pipeline Sémantique : Embeddings + recherche vectorielle (rappel)</li>
+      <li>Fusion des scores : Algorithme RRF + stratégie d'oversampling avant post‑filtrage</li>
+    </ul>
+
+    <h2>Schéma T‑SQL</h2>
+    <pre><code>CREATE TABLE dbo.CacaoProducts
+(
+    ProductID INT PRIMARY KEY,
+    ProductName NVARCHAR(150) NOT NULL,
+    OriginCountry NVARCHAR(100) NOT NULL,
+    BenefitType NVARCHAR(100) NOT NULL,
+    Description NVARCHAR(MAX) NOT NULL,
+    CacaoVector VECTOR(1536) NOT NULL
+);
+</code></pre>
+
+    <h2>Requête Hybride (RRF + oversampling)</h2>
+    <pre><code>DECLARE @userInputText NVARCHAR(1000) = 'remplacer mon café du matin sans stress et avec de la douceur';
+DECLARE @userQueryVector VECTOR(1536) = '[0.012, -0.043, ...]';
+DECLARE @rrfK INT = 60;
+DECLARE @topN INT = 50;
+
+WITH keyword_search AS (
+    SELECT TOP(@topN) p.ProductID,
+        RANK() OVER (ORDER BY ftt.[RANK] DESC) AS keyword_rank
+    FROM dbo.CacaoProducts p
+    INNER JOIN FREETEXTTABLE(dbo.CacaoProducts, Description, @userInputText) AS ftt 
+        ON p.ProductID = ftt.[KEY]
+),
+vector_search AS (
+    SELECT TOP(@topN) t.ProductID,
+        RANK() OVER (ORDER BY s.distance) AS vector_rank
+    FROM VECTOR_SEARCH(
+        TABLE = dbo.CacaoProducts AS t,
+        COLUMN = CacaoVector,
+        SIMILAR_TO = @userQueryVector,
+        METRIC = 'cosine',
+        TOP_N = @topN
+    ) AS s
+),
+combined AS (
+    SELECT TOP(10)
+        COALESCE(ks.ProductID, vs.ProductID) AS ProductID,
+        COALESCE(1.0 / (@rrfK + ks.keyword_rank), 0.0) +
+        COALESCE(1.0 / (@rrfK + vs.vector_rank), 0.0) AS rrf_score
+    FROM keyword_search ks
+    FULL OUTER JOIN vector_search vs ON ks.ProductID = vs.ProductID
+)
+SELECT p.ProductName, p.OriginCountry, p.BenefitType, c.rrf_score
+FROM combined c
+INNER JOIN dbo.CacaoProducts p ON c.ProductID = p.ProductID
+WHERE p.BenefitType = 'Énergie'
+ORDER BY c.rrf_score DESC;
+</code></pre>
+
+    <h2>Ce que démontre ce projet</h2>
+    <p>Compétences : architecture de données, embeddings, SQL avancé, recherche vectorielle, fusion de scores, RAG.</p>
+
+    <p>Référence cours Microsoft Learn: <a href="https://learn.microsoft.com/">Microsoft Learn</a></p>
+
+    <p class="meta">Voir aussi : <a href="/projects/yummyrecipes.html">Investigation Réseau &amp; Durcissement</a></p>
+  </div>
+</body>
+</html>
