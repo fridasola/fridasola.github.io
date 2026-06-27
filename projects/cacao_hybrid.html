@@ -4,43 +4,59 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>CacaoMood — Moteur de Recherche Hybride</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    body { padding: 40px 0; }
+    .back-link { display: inline-block; margin-bottom: 24px; color: var(--text-title); font-weight: 600; text-decoration: none; transition: var(--transition); }
+    .back-link:hover { transform: translateX(-4px); }
+    pre { background: #2d1f24; color: #f8d7e0; padding: 18px; border-radius: 12px; overflow-x: auto; font-family: monospace; border: 1px solid rgba(0,0,0,0.1); }
+    code { color: #ffd1c1; }
+    h2 { font-family: 'Playfair Display', serif; color: var(--text-title); margin-top: 28px; }
+    summary { font-family: 'Poppins', sans-serif; font-weight: 600; color: var(--text-title); cursor: pointer; padding: 8px 0; }
+    .tech-badge { display: inline-block; background: var(--accent-3); color: var(--text-title); padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; margin-right: 6px; margin-top: 6px; }
+  </style>
 </head>
 <body>
   <div class="container">
+    <a href="../index.html" class="back-link">← Retour au portfolio</a>
+
     <div class="pixel-card">
-      <h1 class="pixel-title">🍫 Cas d'Étude : Moteur de Recherche Hybride "CacaoMood"</h1>
-      <p class="meta">Domaine : E‑Commerce Wellness · Rôle : Data Architect · Technologies : Azure SQL, Azure OpenAI, T‑SQL</p>
+      <p style="text-transform: uppercase; font-size: 0.85rem; color: var(--muted); letter-spacing: 1px; margin-bottom: 8px;">Étude de Cas — Architecture Data &amp; AI</p>
+      <h1 class="pixel-title" style="text-align: left; margin-bottom: 6px;">🍫 Cas d'Étude : Moteur de Recherche Hybride "CacaoMood"</h1>
+      <p class="meta" style="margin-bottom: 24px;">Domaine : E‑Commerce Wellness · Rôle : Data Architect · Technologies : Azure SQL, Azure OpenAI, T‑SQL</p>
 
       <h2>1. Contexte &amp; Problématique</h2>
-      <p>Les clients recherchent à la fois par mots‑clés (origine, pourcentage) et par intentions/mood (ex: "remplacer mon café sans anxiété"). Une recherche textuelle classique échoue souvent pour les intentions sémantiques ; la solution combine Full‑Text + Vectoriel.</p>
+      <p>Les clients recherchent à la fois par mots‑clés (origine, pourcentage) et par intentions ou états d'esprit (ex: <em>"remplacer mon café sans anxiété"</em>). Une recherche textuelle classique échoue souvent face aux intentions sémantiques. Cette architecture résout le problème en combinant la précision du Full‑Text avec la puissance du Vectoriel.</p>
 
-      <h2>2. Architecture technique</h2>
+      <h2>2. Architecture Technique</h2>
       <ul>
-        <li><strong>Pipeline Textuel (Précision)</strong> : Index Full‑Text (BM25) pour les correspondances exactes.</li>
-        <li><strong>Pipeline Sémantique (Rappel)</strong> : Embeddings 1536‑D + VECTOR_SEARCH (DiskANN) pour similarité cosinus.</li>
-        <li><strong>Fusion Hybride</strong> : RRF (Reciprocal Rank Fusion) + Oversampling TOP_N avant post‑filtrage.</li>
+        <li><strong>Pipeline Textuel (Précision)</strong> : Index Full‑Text (BM25) pour la correspondance des termes exacts.</li>
+        <li><strong>Pipeline Sémantique (Rappel)</strong> : Embeddings 1536‑D + <code>VECTOR_SEARCH</code> (DiskANN) pour évaluer la similarité cosinus.</li>
+        <li><strong>Fusion Hybride</strong> : Algorithme RRF (Reciprocal Rank Fusion) combiné avec une stratégie d'oversampling (sur-échantillonnage <code>TOP_N</code>) appliqué en amont du post‑filtrage métier.</li>
       </ul>
 
-      <h2>3. Modèle de données (T‑SQL)</h2>
+      <h2>3. Modèle de Données (T‑SQL)</h2>
+      <p>Création de la structure de table supportant nativement l'indexation vectorielle des fiches produits :</p>
       <pre><code>CREATE TABLE dbo.CacaoProducts
 (
-    ProductID INT PRIMARY KEY,
-    ProductName NVARCHAR(150) NOT NULL,
-    OriginCountry NVARCHAR(100) NOT NULL,
-    BenefitType NVARCHAR(100) NOT NULL,
-    Description NVARCHAR(MAX) NOT NULL,
-    CacaoVector VECTOR(1536) NOT NULL
+    ProductID INT PRIMARY KEY,              -- Clé primaire stricte (Requise pour l'indexation DiskANN)
+    ProductName NVARCHAR(150) NOT NULL,     -- ex: 'Élixir Cacao Sacré - Rituel du Matin'
+    OriginCountry NVARCHAR(100) NOT NULL,   -- ex: 'Equateur'
+    BenefitType NVARCHAR(100) NOT NULL,     -- ex: 'Énergie', 'Relaxation', 'Focus'
+    Description NVARCHAR(MAX) NOT NULL,     -- ex: 'Alternative idéale au café. Énergie durable...'
+    CacaoVector VECTOR(1536) NOT NULL       -- Embeddings sémantiques de la fiche produit
 );
 </code></pre>
 
       <h2>4. Requête Hybride (RRF + Oversampling)</h2>
-      <p>Le bloc ci‑dessous montre la stratégie : obtenir TOP_N via VECTOR_SEARCH, fusionner avec FREETEXTTABLE et appliquer RRF pour classer les résultats.</p>
+      <p>Le bloc ci‑dessous détaille l'implémentation : requêter parallèlement les deux pipelines à hauteur de <code>@topN = 50</code>, puis fusionner les rangs via RRF pour éviter l'exclusion prématurée de produits pertinents lors du filtrage final.</p>
 
-      <details>
-        <summary><strong>SQL : Requête hybride RRF (exemple)</strong></summary>
-        <button class="copy-btn" data-target="sql-hybrid-1">Copier le SQL</button>
+      <details style="background: rgba(255,255,255,0.4); padding: 12px 18px; border-radius: 12px; border: 1px solid rgba(90,47,59,0.08); margin-bottom: 20px;">
+        <summary>📂 Cliquez pour dérouler le script SQL de la requête hybride</summary>
+        <button class="copy-btn" data-target="sql-hybrid-1" style="margin-bottom: 10px;">Copier le SQL</button>
         <pre id="sql-hybrid-1"><code>DECLARE @userInputText NVARCHAR(1000) = 'remplacer mon café du matin sans stress et avec de la douceur';
 DECLARE @userQueryVector VECTOR(1536) = '[0.012, -0.043, ...]';
 DECLARE @rrfK INT = 60;
@@ -83,18 +99,28 @@ ORDER BY c.rrf_score DESC;
 </code></pre>
       </details>
 
-      <h2>5. Bonnes pratiques</h2>
+      <h2>5. Bonnes Pratiques Appliquées</h2>
       <ul>
-        <li>Sur‑échantillonnage (TOP_N élevé) avant post‑filtre pour ne pas perdre pertinence.</li>
-        <li>Métriques cosinus pour embeddings, BM25 pour texte.</li>
-        <li>Mesurer latence et qualité (p@k, mrr) et ajuster rrf_k et topN.</li>
+        <li><strong>Sur‑échantillonnage :</strong> Maintien d'un <code>TOP_N</code> élevé lors de l'étape de sélection vectorielle pour préserver la pertinence sémantique avant l'exécution du post-filtrage.</li>
+        <li><strong>Harmonisation :</strong> Utilisation d'indicateurs de distance cosinus pour le pipeline sémantique et du modèle BM25 pour le traitement textuel.</li>
+        <li><strong>Évaluation continue :</strong> Monitorage des indicateurs de qualité (P@K, MRR) pour calibrer dynamiquement la constante de pénalité <code>rrf_k</code> et la profondeur de l'échantillon.</li>
       </ul>
 
-      <p class="meta">Compétences : Architecture hybride, embeddings, RRF, T‑SQL avancé</p>
+      <hr style="border: 0; height: 1px; background: rgba(90,47,59,0.1); margin: 24px 0;">
 
-      <p><a class="pixel-link" href="/projects/cacao_hybrid_full.sql" download>📥 Télécharger le SQL complet</a> • <a class="pixel-link" href="/">← Retour</a></p>
+      <p style="margin-bottom: 16px;"><strong>Compétences démontrées :</strong></p>
+      <div style="margin-bottom: 24px;">
+        <span class="tech-badge">Architecture Hybride</span>
+        <span class="tech-badge">Embeddings &amp; Vecteurs</span>
+        <span class="tech-badge">Algorithme RRF</span>
+        <span class="tech-badge">T‑SQL Avancé</span>
+      </div>
+
+      <p style="margin-bottom: 0;">
+        <a class="pixel-link" href="cacao_hybrid_full (1).sql" download>📥 Télécharger le SQL complet</a>
+      </p>
     </div>
   </div>
-  <script src="/assets/copy.js"></script>
+  <script src="../assets/copy.js"></script>
 </body>
 </html>
