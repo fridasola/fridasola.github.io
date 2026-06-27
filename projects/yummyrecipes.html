@@ -10,7 +10,85 @@
 <body class="retro">
   <div class="container pixel-card">
     <a href="/">← Retour au portfolio</a>
-    <h1 class="pixel-title">Investigation Réseau &amp; Durcissement — yummyrecipesforme</h1>
+   <!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Investigation Réseau — yummyrecipesforme</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    body { padding: 40px 0; }
+    .back-link { display: inline-block; margin-bottom: 24px; color: var(--text-title); font-weight: 600; text-decoration: none; transition: var(--transition); }
+    .back-link:hover { transform: translateX(-4px); }
+    h2, h3 { font-family: 'Playfair Display', serif; color: var(--text-title); margin-top: 28px; }
+    .tech-badge { display: inline-block; background: var(--accent-1); color: var(--text-title); padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; margin-right: 6px; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <a href="../index.html" class="back-link">← Retour au portfolio</a>
+
+    <article class="pixel-card">
+      <p style="text-transform: uppercase; font-size: 0.85rem; color: var(--muted); letter-spacing: 1px; margin-bottom: 8px;">Analyse d'Incident Système &amp; Réseau</p>
+      <h1 class="pixel-title" style="text-align: left; margin-bottom: 6px;">🔒 Investigation Réseau &amp; Durcissement — yummyrecipesforme.com</h1>
+      <p class="meta" style="margin-bottom: 24px;">Statut : Résolu · Rôle : Analyste SOC · Technologies : tcpdump, Sandbox, Durcissement OS</p>
+
+      <h2>1. Présentation de l'Activité &amp; Contexte</h2>
+      <p>Ce document formalise l'investigation menée sur l'infrastructure web de l'entreprise <em>yummyrecipesforme.com</em> suite à une compromission de privilèges et à une redirection malveillante de trafic. Ce projet pratique s'inscrit dans le cadre de la certification Google en Cybersécurité.</p>
+
+      <h2>2. Protocoles Réseau Identifiés</h2>
+      <p>Lors de l'analyse des traces réseau au sein de l'environnement contrôlé (sandbox) et du décodage du journal <code>tcpdump</code>, les protocoles de la couche Application du modèle TCP/IP suivants ont été isolés :</p>
+      <ul>
+        <li><strong>DNS (Domain Name System - Port 53) :</strong> Utilisé en amont pour la résolution des noms de domaine. On observe une première requête légitime pointant vers l'IP réelle du site, puis une seconde requête altérée redirigeant le flux vers l'adresse IP de l'infrastructure pirate.</li>
+        <li><strong>HTTP (Hypertext Transfer Protocol - Port 80) :</strong> Utilisé pour le transfert des fichiers en clair. C'est via ce protocole non sécurisé que le script malveillant de la page d'accueil a poussé le téléchargement du malware et a finalisé la redirection vers le faux domaine.</li>
+      </ul>
+
+      <h2>3. Chronologie des Événements &amp; Preuves</h2>
+      <p>L'attaquant (un ancien employé) a exploité une faille de configuration critique : le compte administratif du panneau de gestion possédait encore ses identifiants par défaut, permettant une attaque par force brute automatisée réussie.</p>
+      
+      <ol>
+        <li><strong>Accès &amp; Persistance :</strong> Authentification réussie sur le panneau d'administration. L'attaquant modifie immédiatement le mot de passe pour verrouiller les accès légitimes du propriétaire.</li>
+        <li><strong>Injection de Code :</strong> Intégration d'une fonction JavaScript frauduleuse directement dans le code source de la page d'accueil.</li>
+        <li><strong>Découverte :</strong> Vagues de courriels de clients au support se plaignant de ralentissements système majeurs et d'invitations suspectes à installer un package de recettes.</li>
+        <li><strong>Analyse Sandbox :</strong> Réplication de l'attaque par l'équipe SOC. Le flux de transactions confirme le schéma : <code>Requête DNS → Requête HTTP → Exécution du fichier → Altération de la table DNS locale → Redirection automatique vers le domaine malveillant greatrecipesforme.com</code>.</li>
+      </ol>
+
+      <p><strong>Matériels d'appui confirmés :</strong> Logs des plaintes clients, extraction du script JavaScript frauduleux injecté, et captures réseau enregistrées par l'utilitaire de diagnostic corroborant les redirections forcées.</p>
+
+      <h2>4. Mesures de Durcissement Correctives (OS &amp; Systèmes)</h2>
+      
+      <h3>Recommandation Prioritaire : Politique d'Authentification Stricte</h3>
+      <ul>
+        <li><strong>Obligation du double facteur (2FA/MFA) :</strong> Tout accès au panneau d'administration devra requérir la validation d'un jeton à usage unique (TOTP) généré sur un terminal physique distinct. Même en cas de compromission du mot de passe, l'accès reste bloqué.</li>
+        <li><strong>Suppression des comptes d'usine :</strong> Modification obligatoire de tous les mots de passe par défaut dès l'initialisation des systèmes.</li>
+      </ul>
+
+      <h3>Actions de Durcissement Complémentaires</h3>
+      <ul>
+        <li><strong>Limitation des tentatives :</strong> Activation de règles de blocage (via des modules de type <code>Fail2ban</code>) pour bannir temporairement toute adresse IP échouant à plus de 3 tentatives d'authentification consécutives.</li>
+        <li><strong>Protection anti-brute force applicative :</strong> Déploiement de solutions de rate limiting, de captcha et de monitoring d'IP suspectes sur les endpoints sensibles.</li>
+        <li><strong>Sécurisation des flux :</strong> Forcer l'usage du protocole chiffré HTTPS/TLS côté serveur (via Let's Encrypt + HSTS) pour éradiquer l'impact des attaques par interception (MitM).</li>
+      </ul>
+
+      <hr style="border: 0; height: 1px; background: rgba(90,47,59,0.1); margin: 24px 0;">
+
+      <p style="margin-bottom: 12px;"><strong>Compétences validées :</strong></p>
+      <div style="margin-bottom: 24px;">
+        <span class="tech-badge">Analyse Réseau (tcpdump)</span>
+        <span class="tech-badge">Durcissement OS</span>
+        <span class="tech-badge">Atténuation Force Brute</span>
+        <span class="tech-badge">Sécurité des Systèmes</span>
+      </div>
+
+      <p class="meta" style="margin-bottom: 0;">Voir aussi : <a href="cacao_hybrid.html" style="color: var(--text-title); font-weight: 600;">CacaoMood — Moteur de Recherche Hybride (Data/AI)</a></p>
+    </article>
+  </main>
+</body>
+</html> <h1 class="pixel-title">Investigation Réseau &amp; Durcissement — yummyrecipesforme</h1>
     <p><strong>Origine :</strong> Activité réalisée dans le cadre de la certification Google en cybersécurité.</p>
 
     <h2>Présentation de l'activité</h2>
