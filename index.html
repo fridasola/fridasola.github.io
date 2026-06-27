@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Portfolio — Emily NOLE</title>
-  <!-- Import des polices -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
@@ -17,24 +16,21 @@
       <div class="pixel-card">
         <img src="assets/profile.svg" alt="Photo de profil de Emily Nole" class="profile">
         <h1 class="pixel-title">Emily NOLE</h1>
-        <p class="sub">Étudiante en L2 Informatique — Université Paris Cité. Curieuse, j'apprends et développe des projets d'IA et de Cybersécurité.</p>
+        <p class="sub">Étudiante en L2 Informatique — Université Paris Cité. Curieuse, j'apprends et développe des projets d'IA, de Data et de Cybersécurité.</p>
         <p><a href="https://github.com/fridasola" target="_blank" class="github-link">@fridasola sur GitHub</a></p>
       </div>
     </div>
   </header>
 
   <main class="container">
-    <!-- À propos -->
     <section id="about" class="pixel-card">
       <h2>À propos</h2>
-      <p>Je suis Emily, étudiante en informatique passionnée par l'apprentissage et la création de projets concrets. J'aime concevoir des architectures de données modernes et explorer les problématiques liées à la sécurité des systèmes.</p>
+      <p>Je suis Emily, étudiante en informatique passionnée par l'apprentissage et la création de projets concrets. J'aime concevoir des architectures de données modernes, manipuler des bases de données relationnelles et explorer les problématiques liées à la sécurité des systèmes et réseaux.</p>
     </section>
 
-    <!-- Projets -->
     <section id="projects" class="pixel-card">
       <h2>Projets clés</h2>
       
-      <!-- Boutons de filtrage -->
       <div class="filter-container" style="margin-bottom: 24px; display: flex; gap: 10px; flex-wrap: wrap;">
         <button class="filter-btn active" onclick="filterProjects('all')">Tout voir</button>
         <button class="filter-btn" onclick="filterProjects('data-ai')">Data / IA</button>
@@ -44,61 +40,64 @@
       </div>
       
       <div class="projects-grid">
-        <!-- Projet 1 : Moteur de Recherche RAG Local (RechercherBoissonIdeal) -->
         <article class="project" data-tags="data-ai sql python">
-          <p class="project-origin"><strong>Origine :</strong> Projet Implémenter des capacités d'IA dans les solutions SQL Server(Inspiré de Microsoft AI Skills)</p>
+          <p class="project-origin"><strong>Origine :</strong> Projet Portfolio GitHub</p>
           <h3>RechercherBoissonIdeal — RAG Local &amp; Sémantique</h3>
           <p>Conception et développement d'un moteur de recherche sémantique et d'un assistant IA fonctionnant à 100% en local pour un catalogue de boissons holistiques et bien-être.</p>
-          
           <ul style="margin: 0 0 16px 0; padding-left: 20px; font-size: 0.9rem;">
             <li><strong>Architecture 3-Tier :</strong> Séparation stricte entre le stockage (SQLite/SQL Server), la couche métier (Python) et l'interface utilisateur graphique (Streamlit).</li>
             <li><strong>Pipeline RAG Souverain :</strong> Génération d'embeddings (768 dimensions via <code>nomic-embed-text</code>) et traitement des requêtes utilisateur avec <code>llama3</code> via Ollama, sans API cloud payante.</li>
-            <li><strong>Moteur Sémantique :</strong> Implémentation du calcul mathématique de similarité cosinus (NumPy) pour faire correspondre les besoins des utilisateurs avec les descriptions du catalogue (ex: associer "anxiété" à une infusion relaxante).</li>
-            <li><strong>Persistance Vectorielle :</strong> Sérialisation et stockage des signatures vectorielles au format JSON directement au sein de la base de données relationnelle.</li>
+            <li><strong>Moteur Sémantique :</strong> Implémentation du calcul mathématique de similarité cosinus (NumPy) pour faire correspondre les besoins des utilisateurs avec les descriptions du catalogue.</li>
           </ul>
-
-          <p class="meta"><strong>Outils :</strong> Python 3.13, SQL, Streamlit, Ollama (Llama3), NumPy, JSON, Architecture 3-Tier</p>
+          <p class="meta"><strong>Outils :</strong> Python 3.13, SQL, Streamlit, Ollama (Llama3), NumPy, Architecture 3-Tier</p>
           <div class="project-links">
             <a class="pixel-link" href="https://github.com/fridasola/RechercherBoissonIdeal" target="_blank">Voir sur GitHub</a>
           </div>
         </article>
 
-        <!-- Projet 2 : Recherche Hybride CacaoMood -->
         <article class="project" data-tags="data-ai sql">
-          <p class="project-origin"><strong>Origine :</strong> Microsoft Data Pro</p>
-          <h3>Moteur de Recherche Hybride &amp; Fusion RRF</h3>
-          <p>Mise en place d'une architecture associant la puissance de la recherche textuelle intégrale et de la recherche vectorielle sémantique.</p>
+          <p class="project-origin"><strong>Origine :</strong> Approfondissement Microsoft Learn</p>
+          <h3>CacaoMood — Moteur Hybride &amp; Fusion RRF</h3>
+          <p>Mise en place d'une architecture de recherche intelligente associant la puissance de la recherche textuelle intégrale et de la recherche vectorielle sémantique.</p>
           <ul style="margin: 0 0 16px 0; padding-left: 20px; font-size: 0.9rem;">
-            <li>Algorithme de fusion Reciprocal Rank Fusion (RRF) pour harmoniser les scores BM25 et de similarité cosinus.</li>
-            <li>Optimisation sémantique et implémentation sur un catalogue produit complexe.</li>
+            <li><strong>Pipeline Hybride :</strong> Indexation Full‑Text (BM25) couplée à une recherche par similarité cosinus via <code>VECTOR_SEARCH</code> (DiskANN).</li>
+            <li><strong>Algorithme RRF :</strong> Utilisation de la fusion de rang réciproque avec sur-échantillonnage (Oversampling) pour garantir la pertinence lors du post-filtrage.</li>
           </ul>
-          <p class="meta"><strong>Outils :</strong> T-SQL, Index Vectoriels, Algorithme RRF, SQL Server AI</p>
+          <p class="meta"><strong>Outils :</strong> T-SQL, Azure SQL, Embeddings 1536-D, Algorithme RRF, DiskANN</p>
           <div class="project-links">
             <a class="pixel-link" href="projects/cacao_hybrid.html">Lire l'étude de cas</a>
           </div>
         </article>
 
-        <!-- Projet 3 : Investigation Réseau Cybersécurité Google -->
         <article class="project" data-tags="cyber">
           <p class="project-origin"><strong>Origine :</strong> Certification Google Cybersécurité</p>
-          <h3>Investigation Réseau &amp; Durcissement de Serveur</h3>
-          <p>Analyse approfondie du trafic réseau à partir de captures pour détecter les vulnérabilités de communication.</p>
+          <h3>Investigation Réseau &amp; Durcissement</h3>
+          <p>Analyse approfondie du trafic réseau à partir de captures pour isoler les vulnérabilités de communication et contrer les attaques par interception.</p>
           <ul style="margin: 0 0 16px 0; padding-left: 20px; font-size: 0.9rem;">
-            <li>Utilisation de <code>tcpdump</code> pour isoler les flux non chiffrés sur le port 80.</li>
-            <li>Élaboration d'un plan de transition HTTPS, TLS 1.3 et politiques HSTS.</li>
+            <li><strong>Analyse de Flux :</strong> Utilisation de <code>tcpdump</code> en environnement contrôlé (Sandbox) pour tracer les anomalies DNS et HTTP (Port 80).</li>
+            <li><strong>Protocole de Durcissement :</strong> Élaboration de recommandations critiques incluant la transition HTTPS, TLS 1.3, HSTS et l'usage de <code>Fail2ban</code>.</li>
           </ul>
-          <p class="meta"><strong>Outils :</strong> tcpdump, Wireshark, Sécurité Réseau, Protocoles</p>
+          <p class="meta"><strong>Outils :</strong> tcpdump, Wireshark, Sandbox, Fail2ban, Sécurité Réseau</p>
           <div class="project-links">
             <a class="pixel-link" href="projects/yummyrecipes.html">Consulter le rapport SOC</a>
           </div>
         </article>
-
-        <!-- [Ici tu pourras copier/coller d'autres blocs <article class="project" data-tags="cyber"> pour tes futures activités Google Cyber !] -->
-
       </div>
     </section>
 
-    <!-- Contact -->
+    <section id="blog" class="pixel-card">
+      <h2>Blog</h2>
+      <p>Articles techniques à venir sur mes découvertes en développement, base de données et sécurité informatique.</p>
+    </section>
+
+    <section id="cv" class="pixel-card">
+      <h2>Mon Curriculum Vitae</h2>
+      <p>Découvrez mon parcours académique, mes compétences techniques ainsi que mes objectifs professionnels en téléchargeant mon CV au format PDF.</p>
+      <p style="margin-bottom: 0;">
+        <a href="cv.pdf" target="_blank" class="cv-btn">📄 Télécharger mon CV (PDF)</a>
+      </p>
+    </section>
+
     <section id="contact" class="pixel-card">
       <h2>Contact</h2>
       <p>Une opportunité, une question ou une envie de collaborer ? N'hésitez pas à m'envoyer un message !</p>
@@ -109,7 +108,7 @@
   <div class="footer-accent"></div>
   <footer>
     <div class="container">
-      <p>© Emily NOLE — Portfolio Spécialisé Data &amp; Cybersécurité</p>
+      <p>© Emily NOLE — Portfolio Spécialisé Data, IA &amp; Cybersécurité</p>
     </div>
   </footer>
 
@@ -118,16 +117,20 @@
       // Gérer l'état actif des boutons
       const buttons = document.querySelectorAll('.filter-btn');
       buttons.forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+      
+      // Ajoute la classe active au bouton cliqué
+      if (event && event.target) {
+        event.target.classList.add('active');
+      }
 
-      // Filtrer les projets
+      // Filtrer les cartes de projets
       const projects = document.querySelectorAll('.project');
       projects.forEach(project => {
         const tags = project.getAttribute('data-tags').split(' ');
         if (tag === 'all' || tags.includes(tag)) {
-          project.style.display = 'flex'; // affiche le projet
+          project.style.display = 'flex';
         } else {
-          project.style.display = 'none'; // cache le projet
+          project.style.display = 'none';
         }
       });
     }
