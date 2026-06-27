@@ -34,42 +34,64 @@
     <section id="projects" class="pixel-card">
       <h2>Projets clés</h2>
       
+      <!-- Boutons de filtrage -->
+      <div class="filter-container" style="margin-bottom: 24px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="filter-btn active" onclick="filterProjects('all')">Tout voir</button>
+        <button class="filter-btn" onclick="filterProjects('data-ai')">Data / IA</button>
+        <button class="filter-btn" onclick="filterProjects('cyber')">Cybersécurité</button>
+        <button class="filter-btn" onclick="filterProjects('sql')">SQL</button>
+        <button class="filter-btn" onclick="filterProjects('python')">Python</button>
+      </div>
+      
       <div class="projects-grid">
-        <!-- Projet 1 : Cybersécurité -->
-        <article class="project">
+        <!-- Projet 1 : Assistant SQL IA (Ton projet GitHub) -->
+        <article class="project" data-tags="data-ai sql python">
+          <p class="project-origin"><strong>Origine :</strong> Projet Portfolio GitHub</p>
+          <h3>Assistant SQL intelligent basé sur l'IA (RAG)</h3>
+          <p>Développement d'un assistant capable de traduire des requêtes en langage naturel en requêtes SQL précises et d'extraire intelligemment des données contextuelles.</p>
+          <ul style="margin: 0 0 16px 0; padding-left: 20px; font-size: 0.9rem;">
+            <li>Intégration d'un pipeline de Retrieval-Augmented Generation (RAG).</li>
+            <li>Conception de scripts Python pour l'interfaçage avec le modèle d'IA et la base de données.</li>
+            <li>Optimisation des requêtes et automatisation du traitement sémantique.</li>
+          </ul>
+          <p class="meta"><strong>Outils :</strong> Python, SQL, RAG, OpenAI API, LangChain</p>
+          <div class="project-links">
+            <a class="pixel-link" href="https://github.com/fridasola" target="_blank">Voir sur GitHub</a>
+          </div>
+        </article>
+
+        <!-- Projet 2 : Recherche Hybride CacaoMood -->
+        <article class="project" data-tags="data-ai sql">
+          <p class="project-origin"><strong>Origine :</strong> Microsoft Data Pro</p>
+          <h3>Moteur de Recherche Hybride &amp; Fusion RRF</h3>
+          <p>Mise en place d'une architecture associant la puissance de la recherche textuelle intégrale et de la recherche vectorielle sémantique.</p>
+          <ul style="margin: 0 0 16px 0; padding-left: 20px; font-size: 0.9rem;">
+            <li>Algorithme de fusion Reciprocal Rank Fusion (RRF) pour harmoniser les scores BM25 et de similarité cosinus.</li>
+            <li>Optimisation sémantique et implémentation sur un catalogue produit complexe.</li>
+          </ul>
+          <p class="meta"><strong>Outils :</strong> T-SQL, Index Vectoriels, Algorithme RRF, SQL Server AI</p>
+          <div class="project-links">
+            <a class="pixel-link" href="projects/cacao_hybrid.html">Lire l'étude de cas</a>
+          </div>
+        </article>
+
+        <!-- Projet 3 : Investigation Réseau Cybersécurité Google -->
+        <article class="project" data-tags="cyber">
           <p class="project-origin"><strong>Origine :</strong> Certification Google Cybersécurité</p>
           <h3>Investigation Réseau &amp; Durcissement de Serveur</h3>
-          <p>Analyse approfondie de la sécurité d'une infrastructure web à partir de captures de trafic réel afin de contrer les risques d'interception de données.</p>
-          
+          <p>Analyse approfondie du trafic réseau à partir de captures pour détecter les vulnérabilités de communication.</p>
           <ul style="margin: 0 0 16px 0; padding-left: 20px; font-size: 0.9rem;">
-            <li>Analyse de paquets et d'extraits <code>tcpdump</code> pour identifier le trafic non chiffré sur le port 80.</li>
-            <li>Élaboration d'un plan de remédiation : transition vers HTTPS, configuration de TLS et politiques HSTS.</li>
-            <li>Rédaction de recommandations de durcissement applicatif pour l'équipe du SOC.</li>
+            <li>Utilisation de <code>tcpdump</code> pour isoler les flux non chiffrés sur le port 80.</li>
+            <li>Élaboration d'un plan de transition HTTPS, TLS 1.3 et politiques HSTS.</li>
           </ul>
-
-          <p class="meta"><strong>Outils :</strong> tcpdump, Wireshark, Protocoles Réseaux, Sécurité Serveur, SOC</p>
+          <p class="meta"><strong>Outils :</strong> tcpdump, Wireshark, Sécurité Réseau, Protocoles</p>
           <div class="project-links">
             <a class="pixel-link" href="projects/yummyrecipes.html">Consulter le rapport SOC</a>
           </div>
         </article>
 
-        <!-- Projet 2 : Data / IA -->
-        <article class="project">
-          <p class="project-origin"><strong>Origine :</strong> Microsoft Data Pro — Implémenter l'IA dans SQL Server</p>
-          <h3>RAG &amp; Recherche Hybride — Architecture CacaoMood</h3>
-          <p>Conception et implémentation de deux moteurs de recherche de pointe pour optimiser l'extraction et l'analyse de données contextuelles.</p>
-          
-          <ul style="margin: 0 0 16px 0; padding-left: 20px; font-size: 0.9rem;">
-            <li><strong>RAG Natif en T-SQL :</strong> Développement de procédures stockées avec vectorisation native et contrôle strict de l'ancrage (grounding).</li>
-            <li><strong>Moteur Hybride :</strong> Algorithme de fusion de classement (RRF) combinant la recherche textuelle (Full‑Text Search) et vectorielle avec suréchantillonnage.</li>
-          </ul>
+        <!-- [Ici tu pourras copier/coller d'autres blocs <article class="project" data-tags="cyber"> pour tes futures activités Google Cyber !] -->
 
-          <p class="meta"><strong>Outils :</strong> T-SQL, SQL Server AI, Embeddings, Index Vectoriels, RAG, RRF</p>
-          <div class="project-links">
-            <a class="pixel-link" href="projects/cacaomood.html">Cas RAG</a>
-            <a class="pixel-link" href="projects/cacao_hybrid.html" style="background: var(--accent-2);">Cas Hybride</a>
-          </div>
-        </article>
       </div>
     </section>
 
