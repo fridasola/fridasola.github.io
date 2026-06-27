@@ -110,5 +110,24 @@
     </div>
   </footer>
 
+  <script>
+    function filterProjects(tag) {
+      // Gérer l'état actif des boutons
+      const buttons = document.querySelectorAll('.filter-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      // Filtrer les projets
+      const projects = document.querySelectorAll('.project');
+      projects.forEach(project => {
+        const tags = project.getAttribute('data-tags').split(' ');
+        if (tag === 'all' || tags.includes(tag)) {
+          project.style.display = 'flex'; // affiche le projet
+        } else {
+          project.style.display = 'none'; // cache le projet
+        }
+      });
+    }
+  </script>
 </body>
 </html>
