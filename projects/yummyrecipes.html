@@ -4,18 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Investigation Réseau — yummyrecipesforme</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../styles.css">
-</head>
-<body class="retro">
-  <div class="container pixel-card">
-    <a href="/">← Retour au portfolio</a>
-   <!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Investigation Réseau — yummyrecipesforme</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
@@ -87,61 +75,5 @@
       <p class="meta" style="margin-bottom: 0;">Voir aussi : <a href="cacao_hybrid.html" style="color: var(--text-title); font-weight: 600;">CacaoMood — Moteur de Recherche Hybride (Data/AI)</a></p>
     </article>
   </main>
-</body>
-</html> <h1 class="pixel-title">Investigation Réseau &amp; Durcissement — yummyrecipesforme</h1>
-    <p><strong>Origine :</strong> Activité réalisée dans le cadre de la certification Google en cybersécurité.</p>
-
-    <h2>Présentation de l'activité</h2>
-    <p>Dans cette activité, rôle d'analyste en cybersécurité pour yummyrecipesforme.com : enquêter sur un comportement suspect lors du chargement de la page principale en analysant un journal <code>tcpdump</code>, documenter l'incident et recommander une mesure corrective.</p>
-
-    <h2>Scénario résumé</h2>
-    <p>Un ancien employé (acteur malveillant) a réalisé une attaque par force brute pour accéder au panneau d'administration en utilisant un mot de passe par défaut. Il a injecté un script JavaScript poussant les visiteurs à télécharger un exécutable malveillant. Après exécution, les machines des victimes étaient redirigées vers <em>greatrecipesforme.com</em> et subissaient des ralentissements. Des signalements clients et des analyses en sandbox ont permis de reproduire le comportement.</p>
-
-    <h2>Étapes observées (journaux tcpdump)</h2>
-    <ol>
-      <li>Requête DNS pour yummyrecipesforme.com → DNS répond avec IP correcte.</li>
-      <li>Requête HTTP vers yummyrecipesforme.com → page s'affiche et invite au téléchargement.</li>
-      <li>Téléchargement et exécution du fichier malveillant.</li>
-      <li>Nouvelle requête DNS pour yummyrecipesforme.com → DNS répond désormais avec l'IP de greatrecipesforme.com.</li>
-      <li>Requête HTTP vers greatrecipesforme.com (redirection malveillante).</li>
-    </ol>
-
-    <h2>Section 1 : Protocoles réseau identifiés</h2>
-    <p>Protocoles observés dans les captures et l'environnement sandbox :</p>
-    <ul>
-      <li><strong>HTTP (port 80)</strong> — transmission de pages non chiffrées et téléchargement du binaire malveillant.</li>
-      <li><strong>DNS</strong> — résolutions de noms, utilisées avant et après compromission pour redirection vers le domaine malveillant.</li>
-    </ul>
-
-    <h2>Section 2 : Documentation de l'incident (faits)</h2>
-    <p><strong>Résumé :</strong> Compromission du serveur via force brute sur un compte administrateur avec mot de passe par défaut. Injection d'un JavaScript malveillant, distribution d'un exécutable entraînant la modification des résolutions DNS locales ou des réponses DNS, et redirection vers un site malveillant.</p>
-
-    <p><strong>Impact :</strong> Incitation au téléchargement, redirections vers site malveillant, ralentissements des machines des utilisateurs, perte d'accès de l'administrateur légitime au panneau (mot de passe modifié).</p>
-
-    <p><strong>Sources et preuves :</strong></p>
-    <ul>
-      <li>Signalements clients (tickets/emails au support).</li>
-      <li>Reproduction dans sandbox confirmant la redirection après exécution du binaire.</li>
-      <li>Journaux tcpdump montrant séquences DNS → HTTP → téléchargement → modification DNS → requêtes vers le domaine malveillant.</li>
-      <li>Examen du code source confirmant l'injection JavaScript dans l'administration.</li>
-    </ul>
-
-    <h2>Section 3 : Recommandations correctives</h2>
-    <p><strong>Mesure recommandée principale :</strong> Imposer l'Authentification à Deux Facteurs (2FA) et forcer le changement des mots de passe par défaut sur tous les comptes administratifs.</p>
-    <p><strong>Pourquoi :</strong> Le 2FA empêche l'accès même si le mot de passe est compromis par force brute. Exiger la suppression/modification des identifiants par défaut élimine la vulnérabilité initiale exploitée par l'attaquant.</p>
-
-    <h3>Actions complémentaires :</h3>
-    <ol>
-      <li>Rotation immédiate de tous les mots de passe administratifs et mise hors ligne/remplacement des comptes compromis.</li>
-      <li>Activer protections anti‑brute force : rate limiting, verrouillage de compte, captcha, et monitoring IP.</li>
-      <li>Scanner et nettoyer le code source ; restaurer depuis sauvegarde fiable si nécessaire.</li>
-      <li>Mettre en place SIEM et alertes sur modifications de code, téléchargements suspects et changements d'IP/DNS.</li>
-      <li>Forcer l'usage de HTTPS/TLS côté serveur (Let's Encrypt + HSTS) pour réduire l'impact des attaques MitM et protéger les utilisateurs.</li>
-    </ol>
-
-    <p><strong>Références / Matériels :</strong> Matériaux d'activité (journal tcpdump, modèle de rapport fourni par le cours) et certification Google Cybersecurity.</p>
-
-    <p class="meta">Voir aussi : <a href="/projects/cacaomood.html">CacaoMood — Moteur de Recherche Hybride (Data/AI)</a></p>
-  </div>
 </body>
 </html>
