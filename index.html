@@ -44,19 +44,22 @@
       </div>
       
       <div class="projects-grid">
-        <!-- Projet 1 : Assistant SQL IA (Ton projet GitHub) -->
+        <!-- Projet 1 : Moteur de Recherche RAG Local (RechercherBoissonIdeal) -->
         <article class="project" data-tags="data-ai sql python">
-          <p class="project-origin"><strong>Origine :</strong> Projet Portfolio GitHub</p>
-          <h3>Assistant SQL intelligent basé sur l'IA (RAG)</h3>
-          <p>Développement d'un assistant capable de traduire des requêtes en langage naturel en requêtes SQL précises et d'extraire intelligemment des données contextuelles.</p>
+          <p class="project-origin"><strong>Origine :</strong> Projet Portfolio GitHub (Inspiré de Microsoft AI Skills Fest)</p>
+          <h3>RechercherBoissonIdeal — RAG Local &amp; Sémantique</h3>
+          <p>Conception et développement d'un moteur de recherche sémantique et d'un assistant IA fonctionnant à 100% en local pour un catalogue de boissons holistiques et bien-être.</p>
+          
           <ul style="margin: 0 0 16px 0; padding-left: 20px; font-size: 0.9rem;">
-            <li>Intégration d'un pipeline de Retrieval-Augmented Generation (RAG).</li>
-            <li>Conception de scripts Python pour l'interfaçage avec le modèle d'IA et la base de données.</li>
-            <li>Optimisation des requêtes et automatisation du traitement sémantique.</li>
+            <li><strong>Architecture 3-Tier :</strong> Séparation stricte entre le stockage (SQLite/SQL Server), la couche métier (Python) et l'interface utilisateur graphique (Streamlit).</li>
+            <li><strong>Pipeline RAG Souverain :</strong> Génération d'embeddings (768 dimensions via <code>nomic-embed-text</code>) et traitement des requêtes utilisateur avec <code>llama3</code> via Ollama, sans API cloud payante.</li>
+            <li><strong>Moteur Sémantique :</strong> Implémentation du calcul mathématique de similarité cosinus (NumPy) pour faire correspondre les besoins des utilisateurs avec les descriptions du catalogue (ex: associer "anxiété" à une infusion relaxante).</li>
+            <li><strong>Persistance Vectorielle :</strong> Sérialisation et stockage des signatures vectorielles au format JSON directement au sein de la base de données relationnelle.</li>
           </ul>
-          <p class="meta"><strong>Outils :</strong> Python, SQL, RAG, OpenAI API, LangChain</p>
+
+          <p class="meta"><strong>Outils :</strong> Python 3.13, SQL, Streamlit, Ollama (Llama3), NumPy, JSON, Architecture 3-Tier</p>
           <div class="project-links">
-            <a class="pixel-link" href="https://github.com/fridasola/RechercherBoissonIdeal/tree/main" target="_blank">Voir sur GitHub</a>
+            <a class="pixel-link" href="https://github.com/fridasola/RechercherBoissonIdeal" target="_blank">Voir sur GitHub</a>
           </div>
         </article>
 
