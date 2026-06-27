@@ -35,38 +35,42 @@
       <h2>Projets clés</h2>
       
       <div class="projects-grid">
-        <!-- Projet 1 -->
+        <!-- Projet 1 : Cybersécurité -->
         <article class="project">
           <p class="project-origin"><strong>Origine :</strong> Certification Google Cybersécurité</p>
-          <h3>Investigation Réseau &amp; Durcissement</h3>
-          <p>Analyse d'extraits tcpdump pour un serveur web, identification des failles liées à l'utilisation de HTTP brut et formulation de recommandations pour l'implémentation de HTTPS, TLS et HSTS.</p>
-          <p class="meta"><strong>Compétences :</strong> tcpdump, Réseau, Durcissement, SOC</p>
+          <h3>Investigation Réseau &amp; Durcissement de Serveur</h3>
+          <p>Analyse approfondie de la sécurité d'une infrastructure web à partir de captures de trafic réel afin de contrer les risques d'interception de données.</p>
+          
+          <ul style="margin: 0 0 16px 0; padding-left: 20px; font-size: 0.9rem;">
+            <li>Analyse de paquets et d'extraits <code>tcpdump</code> pour identifier le trafic non chiffré sur le port 80.</li>
+            <li>Élaboration d'un plan de remédiation : transition vers HTTPS, configuration de TLS et politiques HSTS.</li>
+            <li>Rédaction de recommandations de durcissement applicatif pour l'équipe du SOC.</li>
+          </ul>
+
+          <p class="meta"><strong>Outils :</strong> tcpdump, Wireshark, Protocoles Réseaux, Sécurité Serveur, SOC</p>
           <div class="project-links">
-            <a class="pixel-link" href="projects/yummyrecipes.html">Lire le rapport</a>
+            <a class="pixel-link" href="projects/yummyrecipes.html">Consulter le rapport SOC</a>
           </div>
         </article>
 
-        <!-- Projet 2 -->
+        <!-- Projet 2 : Data / IA -->
         <article class="project">
-          <p class="project-origin"><strong>Origine :</strong> Projet Personnel</p>
-          <h3>RAG &amp; Recherche Hybride — CacaoMood</h3>
-          <p>Mise en place de deux architectures pour optimiser la recherche d'information : un système de RAG natif développé en T‑SQL (procédures stockées, vectorisation native) et un moteur de recherche hybride combinant recherche textuelle et vectorielle (RRF).</p>
-          <p class="meta"><strong>Compétences :</strong> T-SQL, Embeddings, Index vectoriel, RAG</p>
+          <p class="project-origin"><strong>Origine :</strong> Microsoft Data Pro — Implémenter l'IA dans SQL Server</p>
+          <h3>RAG &amp; Recherche Hybride — Architecture CacaoMood</h3>
+          <p>Conception et implémentation de deux moteurs de recherche de pointe pour optimiser l'extraction et l'analyse de données contextuelles.</p>
+          
+          <ul style="margin: 0 0 16px 0; padding-left: 20px; font-size: 0.9rem;">
+            <li><strong>RAG Natif en T-SQL :</strong> Développement de procédures stockées avec vectorisation native et contrôle strict de l'ancrage (grounding).</li>
+            <li><strong>Moteur Hybride :</strong> Algorithme de fusion de classement (RRF) combinant la recherche textuelle (Full‑Text Search) et vectorielle avec suréchantillonnage.</li>
+          </ul>
+
+          <p class="meta"><strong>Outils :</strong> T-SQL, SQL Server AI, Embeddings, Index Vectoriels, RAG, RRF</p>
           <div class="project-links">
             <a class="pixel-link" href="projects/cacaomood.html">Cas RAG</a>
             <a class="pixel-link" href="projects/cacao_hybrid.html" style="background: var(--accent-2);">Cas Hybride</a>
           </div>
         </article>
       </div>
-    </section>
-
-    <!-- CV -->
-    <section id="cv" class="pixel-card">
-      <h2>Mon Curriculum Vitae</h2>
-      <p>Découvrez mon parcours académique, mes compétences techniques ainsi que mes objectifs professionnels en téléchargeant mon CV au format PDF.</p>
-      <p style="margin-bottom: 0;">
-        <a href="cv.pdf" target="_blank" class="cv-btn">📄 Télécharger mon CV (PDF)</a>
-      </p>
     </section>
 
     <!-- Contact -->
