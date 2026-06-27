@@ -182,6 +182,32 @@ main {
   transform: translateY(-1px);
 }
 
+/* Style des boutons de filtrage */
+.filter-btn {
+  padding: 8px 16px;
+  background: var(--card-bg);
+  color: var(--text-title);
+  border: 1px solid rgba(90, 47, 59, 0.15);
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: var(--transition);
+}
+
+.filter-btn:hover {
+  background: var(--accent-1);
+  transform: translateY(-1px);
+}
+
+.filter-btn.active {
+  background: var(--text-title);
+  color: #fff;
+  border-color: var(--text-title);
+  box-shadow: 0 4px 10px rgba(90, 47, 59, 0.2);
+}
+
 /* Bouton Téléchargement CV */
 .cv-btn {
   display: inline-flex;
