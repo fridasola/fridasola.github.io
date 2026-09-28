@@ -1,228 +1,236 @@
+/* --- CONFIGURATION GLOBALE & THÈME FOND ROUGE --- */
 :root {
-  --bg: #F7F4FC; /* Fond lilas/mauve très clair et apaisant */
-  --window-bg: #FFFFFF; /* Fond des cartes blanc pur */
-  --accent-purple: #E8DBFC; /* Mauve doux kawaii */
-  --accent-pink: #FCE1E6; /* Rose pêche très discret */
-  --text-main: #433A4F; /* Violet très foncé (plus doux que le noir) */
-  --muted: #8A7E99;
-  --card-radius: 24px; /* Des arrondis ultra généreux et doux */
-  --soft-shadow: 0 10px 25px rgba(200, 180, 220, 0.25); /* Ombre nuage douce */
-  --transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Animation rebondissante */
+    --bg-color: #7a1c1c;          /* Rouge profond et texturé pour le fond */
+    --card-bg: #5c1414;           /* Rouge un peu plus sombre pour les cartes / blocs */
+    --text-color: #fcf9f5;        /* Texte blanc cassé / lumineux pour contraster */
+    --accent-pink: #f28ab2;       /* Rose poudré pour les tags et petits détails doux */
+    --accent-red: #ff4d4d;        /* Rouge vif pour les accents et survols */
+    --border-color: #9e3636;      /* Bordures douces ton sur ton */
 }
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
-  background-color: var(--bg);
-  /* Un motif de petits pois ultra discret style pastel core */
-  background-image: radial-gradient(var(--accent-purple) 1.5px, transparent 1.5px);
-  background-size: 24px 24px;
-  color: var(--text-main);
-  margin: 0;
-  padding-bottom: 60px;
-  line-height: 1.6;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    padding: 20px;
 }
 
-.container {
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 0 24px;
+/* --- EN-TÊTE & TITRE PRINCIPAL --- */
+header {
+    text-align: center;
+    padding: 60px 20px 40px 20px;
 }
 
-/* Header & Profil */
-.hero {
-  padding: 50px 0 20px 0;
-  text-align: center;
+header h1 {
+    font-size: 2.8rem;
+    color: var(--text-color);
+    font-weight: 700;
+    margin-bottom: 10px;
 }
 
-.profile {
-  width: 120px;
-  height: 120px;
-  border-radius: 40px; /* Coins très arrondis façon icône d'application */
-  display: block;
-  margin: 0 auto 20px;
-  border: 4px solid #FFFFFF;
-  box-shadow: var(--soft-shadow);
-}
-
-.pixel-title {
-  font-family: 'Playfair Display', serif;
-  font-weight: 700;
-  font-size: 2.8rem;
-  color: var(--text-main);
-  margin: 0 0 8px;
-}
-
-.sub {
-  color: var(--muted);
-  max-width: 550px;
-  margin: 0 auto 20px;
-  font-size: 1.05rem;
-}
-
-.github-link {
-  display: inline-flex;
-  align-items: center;
-  color: var(--text-main);
-  font-weight: 600;
-  text-decoration: none;
-  background: var(--accent-purple);
-  padding: 8px 20px;
-  border-radius: 30px; /* Bouton pilule tout rond */
-  font-size: 0.9rem;
-  transition: var(--transition);
-}
-
-.github-link:hover {
-  transform: scale(1.05);
-  box-shadow: 0 5px 15px rgba(232, 219, 252, 0.6);
-}
-
-/* Les Cartes Nuages (Anciennes pixel-cards) */
-.pixel-card {
-  background: var(--window-bg);
-  border-radius: var(--card-radius);
-  padding: 32px;
-  margin-bottom: 24px;
-  box-shadow: var(--soft-shadow);
-  border: 1px solid rgba(232, 219, 252, 0.4);
-  transition: var(--transition);
-}
-
-.pixel-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 15px 35px rgba(200, 180, 220, 0.35);
-}
-
-/* Titres des sections */
-h2 {
-  font-family: 'Playfair Display', serif;
-  color: var(--text-main);
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 1.75rem;
-  display: inline-block;
-  position: relative;
-}
-
-/* Petite vague ou ligne douce sous le titre */
-h2::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 40px;
-  height: 4px;
-  background: var(--accent-purple);
-  border-radius: 2px;
-}
-
-/* Grille de projets */
+/* --- GRILLE DE PROJETS --- */
 .projects-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-  margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1000px;
+    margin: 40px auto;
 }
 
-@media (min-width: 768px) {
-  .projects-grid { grid-template-columns: 1fr 1fr; }
-}
-
+/* --- CARTES DE PROJETS --- */
 .project {
-  background: #FAF8FF; /* Fond mauve/blanc très doux pour l'intérieur */
-  border-radius: 20px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid rgba(232, 219, 252, 0.3);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
-.project h3 {
-  margin: 0 0 10px;
-  font-family: 'Playfair Display', serif;
-  color: var(--text-main);
-  font-size: 1.25rem;
+.project:hover {
+    border-color: var(--accent-pink);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
 }
 
 .project-origin {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--muted);
-  background: var(--accent-pink); /* Une petite touche de pêche douce */
-  padding: 4px 12px;
-  border-radius: 20px;
-  align-self: flex-start;
-  margin-bottom: 12px !important;
+    display: inline-block;
+    background-color: var(--accent-pink);
+    color: #2b2b2b;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 15px;
 }
 
-.meta {
-  font-size: 0.85rem;
-  color: var(--muted);
-  background: #FFFFFF;
-  padding: 8px 12px;
-  border-radius: 12px;
-  margin-top: auto;
-  border: 1px solid rgba(232, 219, 252, 0.2);
+.project h3 {
+    font-size: 1.4rem;
+    color: var(--text-color);
+    margin-bottom: 12px;
+    font-weight: 700;
 }
 
-/* Liens, Boutons et Filtres de recherche */
-.pixel-link, .cv-btn, .filter-btn {
-  display: inline-block;
-  padding: 10px 18px;
-  background: #FFFFFF;
-  color: var(--text-main);
-  border: 2px solid var(--accent-purple);
-  border-radius: 20px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: var(--transition);
+.project p {
+    font-size: 0.95rem;
+    color: #e6dede;
+    margin-bottom: 20px;
 }
 
-.pixel-link:hover, .cv-btn:hover, .filter-btn:hover {
-  background: var(--accent-purple);
-  transform: translateY(-2px);
+.project-tools {
+    font-size: 0.85rem;
+    color: #f0e6e0;
+    margin-bottom: 20px;
+    background-color: rgba(0, 0, 0, 0.15);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px dashed var(--border-color);
 }
 
+/* --- BOUTONS --- */
+.project-btn {
+    display: inline-block;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--text-color);
+    color: var(--bg-color);
+    padding: 10px 18px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    flex: 1;
+}
+
+.project-btn:hover {
+    background-color: var(--accent-pink);
+    color: #2b2b2b;
+    transform: translateY(-2px);
+}
+
+/* Bouton secondaire (ex: Code source / GitHub) au look subtil */
+.project-btn.secondary {
+    background-color: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.project-btn.secondary:hover {
+    background-color: var(--border-color);
+    color: var(--text-color);
+}
+
+/* --- SECTION DES FILTRES DE PROJETS --- */
 .filter-container {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0 40px 0;
+    flex-wrap: wrap;
 }
 
-.filter-btn.active {
-  background: var(--accent-purple);
-  border-color: var(--accent-purple);
-  box-shadow: 0 4px 12px rgba(232, 219, 252, 0.5);
+.filter-btn {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-/* Bouton Spécifique CV (Menthe douce) */
-.cv-btn {
-  background: #EAFCF1;
-  border-color: #BFF2D4;
-}
-.cv-btn:hover {
-  background: #BFF2D4;
+.filter-btn:hover, .filter-btn.active {
+    background-color: var(--accent-pink);
+    color: #2b2b2b;
+    border-color: var(--accent-pink);
+    transform: translateY(-2px);
 }
 
-/* Footer mignon */
-.footer-accent {
-  height: 6px;
-  background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink), var(--accent-purple));
-  border-radius: 10px;
-  max-width: 200px;
-  margin: 40px auto 0 auto;
+/* --- SECTION ABOUT ME --- */
+.about-section {
+    padding: 60px 20px;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
-footer {
-  text-align: center;
-  padding: 20px;
-  color: var(--muted);
-  font-size: 0.85rem;
+.about-container {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.about-title {
+    font-size: 2.2rem;
+    color: var(--text-color);
+    margin-bottom: 24px;
+    font-weight: 700;
+}
+
+.about-content {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.about-text {
+    flex: 1;
+    min-width: 280px;
+}
+
+.about-text p {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    color: #e6dede;
+}
+
+.polaroid-frame {
+    background: #fcf9f5;
+    padding: 15px 15px 35px 15px;
+    border-radius: 4px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    transform: rotate(3deg);
+    transition: transform 0.3s ease;
+}
+
+.polaroid-frame:hover {
+    transform: rotate(0deg) scale(1.02);
+}
+
+.polaroid-placeholder {
+    width: 160px;
+    height: 180px;
+    background-color: #ebd7d7;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    border: 1px dashed var(--accent-red);
+}
+
+.polaroid-caption {
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: #2b2b2b;
 }

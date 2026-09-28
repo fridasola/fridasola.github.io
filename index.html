@@ -14,13 +14,39 @@
   <header class="hero">
     <div class="container">
       <div class="pixel-card">
-        <img src="assets/profile.svg" alt="Photo de profil de Emily Nole" class="profile">
-        <h1 class="pixel-title">Emily NOLE</h1>
+        <h1 class="scramble-text">Hi, I'm Emily.</h1>
         <p class="sub">Étudiante en L2 Informatique — Université Paris Cité. Curieuse, j'apprends et développe des projets d'IA, de Data et de Cybersécurité.</p>
         <p><a href="https://github.com/fridasola" target="_blank" class="github-link">@fridasola sur GitHub</a></p>
       </div>
     </div>
   </header>
+  <section id="about" class="about-section">
+    <div class="about-container">
+      <!-- Titre principal style manuscrit / élégant -->
+      <h2 class="about-title">About Me</h2>
+       
+      <div class="about-content">
+        <!-- Texte de présentation -->
+        <div class="about-text">
+          <p>
+            Étudiante en informatique et mathématiques, passionnée par le développement, la logique algorithmique et la cybersécurité. 
+          </p>
+          <p>
+            J'aime concevoir des applications propres, explorer des architectures réseau et donner vie à des projets techniques avec une touche esthétique et créative.
+          </p>
+        </div>
+
+        <!-- Espace visuel / Polaroid ou cadre photo -->
+        <div class="about-visual">
+          <div class="polaroid-frame">
+            <!-- Vous pourrez y glisser votre image ou un visuel sympa -->
+            <div class="polaroid-placeholder">✨</div>
+            <span class="polaroid-caption">Emily S.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <main class="container">
     <section id="about" class="pixel-card">
@@ -52,7 +78,7 @@
           </div>
           <p class="meta"><strong>Outils :</strong> Python 3.13, SQL, Streamlit, Ollama (Llama3), Base de donnée relationnelle</p>
           <div class="project-links">
-            <a class="pixel-link" href="https://github.com/fridasola/RechercherBoissonIdeal" target="_blank">Voir sur GitHub</a>
+            <a class="project-btn" href="https://github.com/fridasola/RechercherBoissonIdeal" target="_blank">Voir sur GitHub</a>
           </div>
         </article>
 
@@ -67,20 +93,19 @@
           </div>
           <p class="meta"><strong>Outils :</strong> Python, Architecture Client-Serveur, Programmation Réseau</p></p>
           <div class="project-links">
-            <a class="pixel-link" href="https://github.com/fridasola/Ghost-Chase" target="_blank">Voir sur GitHub</a>
+            <a class="project-btn" href="https://github.com/fridasola/Ghost-Chase" target="_blank">Voir sur GitHub</a>
           </div>
         </article>
-        <article class="project" data-tags="cybersécurité réseau">
+        <article class="project" data-tags="cybersecurité réseau">
           <p class="project-origin"><strong>Origine :</strong> Certification Google Cybersécurité</p>
           <h3>Investigation Réseau & Durcissement</h3>
           <div class="project-card">
-            <p>
+          <p>
             Analyse approfondie du trafic réseau à partir de captures pour identifier les vulnérabilités de communication 
             et appliquer des protocoles de durcissement et de sécurisation (dans le cadre de la certification Google Cybersécurité).
-            </p>
-          </div>
+          </p>
           <p class="meta"><strong>Outils :</strong> tcpdump, Wireshark, Fail2ban, Sécurité Réseau</p>
-          <div class="project-links">
+          <div class="project-btn">
             <a class="pixel-link" href="projects/yummyrecipes.html">Consulter le rapport SOC</a>
           </div>
         </article>
@@ -135,6 +160,64 @@
           project.style.display = 'none';
         }
       });
+    }
+    class CuteTypewriter {
+      constructor(el, phrases) {
+        this.el = el;
+        this.phrases = phrases;
+        this.chars = '-_@^*/+.!,?♥'; // Caractères doux
+        this.currentPhraseIndex = 0;
+        this.init();
+      }
+
+      init() {
+        this.animateText();
+      }
+
+      async animateText() {
+        while (true) {
+          const targetText = this.phrases[this.currentPhraseIndex];
+          let displayedText = "";
+
+          // Écriture lettre par lettre de façon bien plus lente et douce
+          for (let i = 0; i < targetText.length; i++) {
+            // Petit effet de clignotement mignon sur la lettre en cours
+            for (let j = 0; j < 2; j++) {
+              const randomChar = this.chars[Math.floor(Math.random() * this.chars.length)];
+              this.el.innerHTML = displayedText + `<span style="color: var(--accent-pink);">${randomChar}</span>`;
+              await new Promise(r => setTimeout(r, 60)); // Plus lent
+            }
+            // On pose la vraie lettre
+            displayedText += targetText[i];
+            this.el.innerText = displayedText;
+            await new Promise(r => setTimeout(r, 150)); // Vitesse de frappe posée et naturelle
+          }
+
+          // Pause longue pour admirer la phrase affichée
+          await new Promise(r => setTimeout(r, 4000));
+          // Effacement doux vers la gauche
+          for (let i = targetText.length; i > 0; i--) {
+            displayedText = targetText.substring(0, i - 1);
+            this.el.innerText = displayedText;
+            await new Promise(r => setTimeout(r, 80));
+          }
+          // Petite pause avant la phrase suivante
+          this.currentPhraseIndex = (this.currentPhraseIndex + 1) % this.phrases.length;
+          await new Promise(r => setTimeout(r, 800));
+        }
+      }
+    }
+    // Les phrases d'introduction
+    const phrases = [
+      "Hi, I'm Emily",
+      "Étudiante en Informatique.",
+      "Bienvenue dans mon univers"
+    ];
+
+    // Lancement sur l'élément
+    const el = document.querySelector('.scramble-text');
+    if (el) {
+      new CuteTypewriter(el, phrases);
     }
   </script>
 </body>
