@@ -41,43 +41,47 @@
       
       <div class="projects-grid">
         <article class="project" data-tags="data-ai sql python">
-          <p class="project-origin"><strong>Origine :</strong> Projet Portfolio GitHub</p>
-          <h3>RechercherBoissonIdeal — RAG Local &amp; Sémantique</h3>
-          <p>Conception et développement d'un moteur de recherche sémantique et d'un assistant IA fonctionnant à 100% en local pour un catalogue de boissons holistiques et bien-être.</p>
-          <ul style="margin: 0 0 16px 0; padding-left: 20px; font-size: 0.9rem;">
-            <li><strong>Architecture 3-Tier :</strong> Séparation stricte entre le stockage (SQLite/SQL Server), la couche métier (Python) et l'interface utilisateur graphique (Streamlit).</li>
-            <li><strong>Pipeline RAG Souverain :</strong> Génération d'embeddings (768 dimensions via <code>nomic-embed-text</code>) et traitement des requêtes utilisateur avec <code>llama3</code> via Ollama, sans API cloud payante.</li>
-            <li><strong>Moteur Sémantique :</strong> Implémentation du calcul mathématique de similarité cosinus (NumPy) pour faire correspondre les besoins des utilisateurs avec les descriptions du catalogue.</li>
-          </ul>
-          <p class="meta"><strong>Outils :</strong> Python 3.13, SQL, Streamlit, Ollama (Llama3), NumPy, Architecture 3-Tier</p>
+          <p class="project-origin"><strong>Origine :</strong> Approfondissement Microsoft Learn</p>
+          <h3>RechercherBoissonIdeal — RAG Local & Sémantique</h3>
+          <div class="project-card">
+            <h3>RechercherBoissonIdeal — Application Python & SQL</h3>
+            <p>
+              Conception d'une application interactive en Python pour explorer un catalogue de boissons de bien-être. 
+              Le projet intègre un script d'initialisation, une base de données SQL structurée et une application centrale de recherche.
+            </p>
+          </div>
+          <p class="meta"><strong>Outils :</strong> Python 3.13, SQL, Streamlit, Ollama (Llama3), Base de donnée relationnelle</p>
           <div class="project-links">
             <a class="pixel-link" href="https://github.com/fridasola/RechercherBoissonIdeal" target="_blank">Voir sur GitHub</a>
           </div>
         </article>
 
-        <article class="project" data-tags="data-ai sql">
+        <div class="projects-grid">
+        <article class="project" data-tags="python réseau">
           <p class="project-origin"><strong>Origine :</strong> Approfondissement Microsoft Learn</p>
-          <h3>CacaoMood — Moteur Hybride &amp; Fusion RRF</h3>
-          <p>Mise en place d'une architecture de recherche intelligente associant la puissance de la recherche textuelle intégrale et de la recherche vectorielle sémantique.</p>
-          <ul style="margin: 0 0 16px 0; padding-left: 20px; font-size: 0.9rem;">
-            <li><strong>Pipeline Hybride :</strong> Indexation Full‑Text (BM25) couplée à une recherche par similarité cosinus via <code>VECTOR_SEARCH</code> (DiskANN).</li>
-            <li><strong>Algorithme RRF :</strong> Utilisation de la fusion de rang réciproque avec sur-échantillonnage (Oversampling) pour garantir la pertinence lors du post-filtrage.</li>
-          </ul>
-          <p class="meta"><strong>Outils :</strong> T-SQL, Azure SQL, Embeddings 1536-D, Algorithme RRF, DiskANN</p>
+          <h3>Ghost-Chase — Jeu Multijoueur en Réseau</h3>
+          <div class="project-card">
+            <h3>RechercherBoissonIdeal — Application Python & SQL</h3>
+            <p>
+              Développement complet d'un jeu multijoueur en Python reposant sur une architecture client-serveur robuste, 
+            incluant la gestion des salons de connexion, des sockets réseau et de la logique de gameplay.
+        </p>
+            </p>
+          </div>
+          <p class="meta"><strong>Outils :</strong> Python, Architecture Client-Serveur, Programmation Réseau</p></p>
           <div class="project-links">
-            <a class="pixel-link" href="projects/cacao_hybrid.html">Lire l'étude de cas</a>
+            <a class="pixel-link" href="https://github.com/fridasola/Ghost-Chase" target="_blank">Voir sur GitHub</a>
           </div>
         </article>
 
-        <article class="project" data-tags="cyber">
+        <article class="project" data-tags="cybersécurité réseau">
           <p class="project-origin"><strong>Origine :</strong> Certification Google Cybersécurité</p>
-          <h3>Investigation Réseau &amp; Durcissement</h3>
-          <p>Analyse approfondie du trafic réseau à partir de captures pour isoler les vulnérabilités de communication et contrer les attaques par interception.</p>
-          <ul style="margin: 0 0 16px 0; padding-left: 20px; font-size: 0.9rem;">
-            <li><strong>Analyse de Flux :</strong> Utilisation de <code>tcpdump</code> en environnement contrôlé (Sandbox) pour tracer les anomalies DNS et HTTP (Port 80).</li>
-            <li><strong>Protocole de Durcissement :</strong> Élaboration de recommandations critiques incluant la transition HTTPS, TLS 1.3, HSTS et l'usage de <code>Fail2ban</code>.</li>
-          </ul>
-          <p class="meta"><strong>Outils :</strong> tcpdump, Wireshark, Sandbox, Fail2ban, Sécurité Réseau</p>
+          <h3>Investigation Réseau & Durcissement</h3>
+          <p>
+          Analyse approfondie du trafic réseau à partir de captures pour identifier les vulnérabilités de communication 
+          et appliquer des protocoles de durcissement et de sécurisation (dans le cadre de la certification Google Cybersécurité).
+          </p>
+          <p class="meta"><strong>Outils :</strong> tcpdump, Wireshark, Fail2ban, Sécurité Réseau</p>
           <div class="project-links">
             <a class="pixel-link" href="projects/yummyrecipes.html">Consulter le rapport SOC</a>
           </div>
